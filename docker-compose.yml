@@ -25,6 +25,18 @@ services:
     networks:
       - ednet
 
+  fastapi:
+    build:
+      context: ./fastapi               # Create this folder next to flask/nginx
+      dockerfile: Dockerfile
+    container_name: fastapi-edmuhlestein
+    restart: unless-stopped
+    expose:
+      - "8000"                         # Internal port (no external exposure)
+    networks:
+      - ednet
+    # Optional: environment, volumes, depends_on if needed
+
   certbot:
     image: certbot/certbot:latest
     container_name: certbot
