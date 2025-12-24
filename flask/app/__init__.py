@@ -7,7 +7,7 @@ def create_app():
 
     @app.route("/")
     def home():
-        return "<h1>Welcome to edmuhlestein.com</h1><p>Flask + Nginx + Certbot deployed!</p>"
+        return "<h1>Welcome to edmuhlestein.com</h1><p>Flask + FastAPI + Nginx + Certbot deployed!</p><br>FastAPI available through /api/hello or /api/health"
 
     @app.route("/health")
     def health():
