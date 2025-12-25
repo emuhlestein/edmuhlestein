@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime, timezone
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="/app/app/templates")
 router = APIRouter(tags=["root"])
 
 @router.get("/", response_class=HTMLResponse, summary="Home page")

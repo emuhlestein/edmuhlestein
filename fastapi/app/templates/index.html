@@ -27,7 +27,7 @@
             {% if current_user %}
                 <li>Hello, <strong>{{ current_user.username }}</strong>! <a href="/users/me">View Profile</a></li>
             {% else %}
-                <li><a href="/auth/login">Login</a> or <a href="/auth/register">Register</a></li>
+                <li><a href="/api/auth/login">Login</a> or <a href="/api/auth/register">Register</a></li>
             {% endif %}
         </ul>
 

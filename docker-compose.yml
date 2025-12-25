@@ -12,6 +12,7 @@ services:
       - letsencrypt-www:/var/www/certbot:ro
     depends_on:
       - flask
+      - nodejs
     networks:
       - ednet
 

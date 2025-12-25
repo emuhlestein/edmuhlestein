@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from app.routers import (
     root_router,
+    auth_router,
 )
 
 app = FastAPI()
 
 app.include_router(root_router)
+app.include_router(auth_router)
 
 # @app.get("/health")
 # def health():
