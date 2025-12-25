@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #6366f1; }
+        a { color: #4f46e5; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul { line-height: 1.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ message }}</h1>
+        <p>Welcome to the <strong>{{ app_name }}</strong> API!</p>
+        <p>This is a production-ready, modular FastAPI application.</p>
+
+        <h2>Useful Links</h2>
+        <ul>
+            <li><a href="/docs" target="_blank">Interactive API Documentation (Swagger UI)</a></li>
+            <li><a href="/redoc" target="_blank">Alternative API Docs (ReDoc)</a></li>
+            <li><a href="/health">Health Check Endpoint</a></li>
+            {% if current_user %}
+                <li>Hello, <strong>{{ current_user.username }}</strong>! <a href="/users/me">View Profile</a></li>
+            {% else %}
+                <li><a href="/auth/login">Login</a> or <a href="/auth/register">Register</a></li>
+            {% endif %}
+        </ul>
+
+        <footer style="margin-top: 50px; font-size: 0.9em; color: #666;">
+            Built with FastAPI • Running version {{ version }} • {{ current_time }}
+        </footer>
+    </div>
+</body>
+</html>
