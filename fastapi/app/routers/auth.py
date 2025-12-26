@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-templates = Jinja2Templates(directory="/app/app/templates")
+templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix="/auth", tags=["auth"])
 # router = APIRouter(tags=["auth"])
 

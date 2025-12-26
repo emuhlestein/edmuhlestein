@@ -1,30 +1,13 @@
 services:
-  nginx:
-    build: ./nginx
-    image: edmuhlestein-nginx:latest
-    container_name: nginx-edmuhlestein
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - letsencrypt-conf:/etc/letsencrypt:ro
-      - letsencrypt-www:/var/www/certbot:ro
-    depends_on:
-      - flask
-      - nodejs
-    networks:
-      - ednet
-
-  flask:
-    build: ./flask
-    image: edmuhlestein-flask:latest
-    container_name: flask-edmuhlestein
-    restart: unless-stopped
-    expose:
-      - "5000"
-    networks:
-      - ednet
+  # flask:
+  #   build: ./flask
+  #   image: edmuhlestein-flask:latest
+  #   container_name: flask-edmuhlestein
+  #   restart: unless-stopped
+  #   expose:
+  #     - "5000"
+  #   networks:
+  #     - ednet
 
   fastapi:
     build:
@@ -37,56 +20,6 @@ services:
     networks:
       - ednet
     # Optional: environment, volumes, depends_on if needed
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"  # Optional: expose for local tools
-    volumes:
-      - redis-data:/data  # Persist data (optional)
-
-  nodejs:
-    build: ./nodejs     # Path to the directory containing your Dockerfile
-    image: edmuhlestein-nodejs:latest
-    container_name: nodejs-edmuhlestein
-    expose:
-      - "3000"
-    networks:
-      - ednet
-
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
-    restart: unless-stopped
-    entrypoint: /bin/sh
-    command: |
-      -c "
-      trap exit TERM;
-
-      if [ ! -d /etc/letsencrypt/live/edmuhlestein.com ]; then
-        echo 'Obtaining initial certificate...';
-        certbot certonly --webroot -w /var/www/certbot -d edmuhlestein.com -d www.edmuhlestein.com --email emuhlestein@yahoo.com --agree-tos --no-eff-email --non-interactive || true;
-      fi;
-
-      echo 'Starting renewal loop';
-      while :; do
-        certbot renew --webroot -w /var/www/certbot --non-interactive --quiet || true;
-        echo 'Renewal check complete. Sleeping 12 hours...';
-        sleep 12h;
-      done
-      "
-    volumes:
-      - letsencrypt-conf:/etc/letsencrypt
-      - letsencrypt-www:/var/www/certbot
-    depends_on:
-      - nginx
-    networks:
-      - ednet
-
-volumes:
-  letsencrypt-conf:
-  letsencrypt-www:
-  redis-data:
 
 networks:
   ednet:
