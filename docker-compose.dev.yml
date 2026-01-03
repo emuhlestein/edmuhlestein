@@ -6,11 +6,26 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"   # Expose FastAPI directly to localhost:8000
+    env_file:
+      - ./env
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
     volumes:
       - ./fastapi/app:/app
     environment:
       - DEBUG=true
-    # env_file:
-    #   - .env.dev
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - ednet
 
+volumes:
+  db_data:

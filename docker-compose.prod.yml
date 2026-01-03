@@ -7,23 +7,13 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    env_file:
+      - /etc/edmuhlestein.com/prod.env
     volumes:
       - letsencrypt-conf:/etc/letsencrypt:ro
       - letsencrypt-www:/var/www/certbot:ro
-    # depends_on:
-    #   - flask
     networks:
       - ednet
-
-  # flask:
-  #   build: ./flask
-  #   image: edmuhlestein-flask:latest
-  #   container_name: flask-edmuhlestein
-  #   restart: unless-stopped
-  #   expose:
-  #     - "5000"
-  #   networks:
-  #     - ednet
 
   fastapi:
     build:
@@ -35,23 +25,21 @@ services:
       - "8000"                         # Internal port (no external exposure)
     networks:
       - ednet
-    # Optional: environment, volumes, depends_on if needed
 
-  # redis:
-  #   image: redis:7-alpine
-  #   ports:
-  #     - "6379:6379"  # Optional: expose for local tools
-  #   volumes:
-  #     - redis-data:/data  # Persist data (optional)
-
-  # nodejs:
-  #   build: ./nodejs     # Path to the directory containing your Dockerfile
-  #   image: edmuhlestein-nodejs:latest
-  #   container_name: nodejs-edmuhlestein
-  #   expose:
-  #     - "3000"
-  #   networks:
-  #     - ednet
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - /etc/edmuhlestein.com/prod.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - ednet
 
   certbot:
     image: certbot/certbot:latest
@@ -85,7 +73,7 @@ services:
 volumes:
   letsencrypt-conf:
   letsencrypt-www:
-  redis-data:
+  db_data:
 
 networks:
   ednet:
