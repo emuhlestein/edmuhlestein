@@ -8,9 +8,11 @@ SQLAlchemy==2.0.45
 asyncpg==0.31.0
 psycopg2-binary==2.9.11
 passlib[bcrypt]==1.7.4
-pydantic[email]==2.12.x
-alembic==1.13.x
+pydantic[email]==2.10.5
+pydantic-core==2.27.2
+alembic==1.14.0
 pyjwt==2.10.1
 python-dotenv==1.2.1
 sqlmodel==0.0.31
 pydantic-settings==2.12.0
+typer==0.15.1

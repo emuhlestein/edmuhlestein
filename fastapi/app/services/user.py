@@ -30,3 +30,34 @@ async def create_user(db: AsyncSession, user_in: UserCreate) -> User:
     await db.commit()
     await db.refresh(db_user)
     return db_user
+
+async def user_exists(
+    db: AsyncSession,
+    *,
+    email: str | None = None,
+    username: str | None = None,
+    user_id: int | None = None,
+) -> bool:
+    """
+    Check if a user exists by email, username, or ID.
+    Returns True if at least one matching user is found.
+    
+    Usage examples:
+        await user_exists(db, email="user@example.com")
+        await user_exists(db, username="johndoe")
+        await user_exists(db, user_id=42)
+    """
+    if not any([email, username, user_id]):
+        return False
+
+    stmt = select(User.id).limit(1)  # we only need to know if it exists
+
+    if email:
+        stmt = stmt.where(User.email == email)
+    elif username:
+        stmt = stmt.where(User.username == username)
+    elif user_id:
+        stmt = stmt.where(User.id == user_id)
+
+    result = await db.execute(stmt)
+    return result.scalar() is not None
