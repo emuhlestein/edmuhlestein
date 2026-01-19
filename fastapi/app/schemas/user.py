@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -19,9 +20,7 @@ class UserUpdate(BaseModel):
     is_superuser: Optional[bool] = None
 
 class UserResponse(UserBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
     updated_at: Optional[datetime]
-
-    class Config:
-        from_attributes = True

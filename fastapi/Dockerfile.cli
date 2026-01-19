@@ -1,0 +1,24 @@
+# Dockerfile.cli
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies (same as API)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code (same as API)
+COPY app/ .
+
+# Optional: Add useful tools commonly needed in CLI/admin containers
+# (uncomment if you need them – e.g. for database dumps, debugging, etc.)
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     postgresql-client \
+#     && rm -rf /var/lib/apt/lists/*
+
+# The key difference – point to your CLI entrypoint
+ENTRYPOINT ["python", "/app/cli.py"]
+# ENTRYPOINT ["ls"]
+
+# Default behavior when no arguments are provided
+CMD ["--help"]

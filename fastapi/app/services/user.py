@@ -1,19 +1,21 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from ..models.user import User
 from ..schemas.user import UserCreate
 from ..core.security import get_password_hash
 
 
-async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
-    result = await db.execute(select(User).where(User.email == email))
-    return result.scalar_one_or_none()
+def get_user_by_email(db: Session, email: str) -> User | None:
+    result = db.execute(select(User).where(User.email == email))
+    return result.scalars().first()
 
 
-async def create_user(db: AsyncSession, user_in: UserCreate) -> User:
-    existing_user = await get_user_by_email(db, user_in.email)
+def create_user(db: Session, user_in: UserCreate) -> User:
+    existing_user = get_user_by_email(db, user_in.email)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -26,17 +28,25 @@ async def create_user(db: AsyncSession, user_in: UserCreate) -> User:
         hashed_password=hashed_password,
         full_name=user_in.full_name,
     )
+
     db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email or username already registered",
+        )
+    db.refresh(db_user)
     return db_user
 
-async def user_exists(
-    db: AsyncSession,
+def user_exists(
+    db: Session,
     *,
-    email: str | None = None,
-    username: str | None = None,
-    user_id: int | None = None,
+    email: Optional[str] = None,
+    username: Optional[str] = None,
+    user_id: Optional[int] = None,
 ) -> bool:
     """
     Check if a user exists by email, username, or ID.
@@ -54,10 +64,10 @@ async def user_exists(
 
     if email:
         stmt = stmt.where(User.email == email)
-    elif username:
+    if username:
         stmt = stmt.where(User.username == username)
-    elif user_id:
+    if user_id:
         stmt = stmt.where(User.id == user_id)
 
-    result = await db.execute(stmt)
-    return result.scalar() is not None
+    result = db.execute(stmt)
+    return result.scalars().first() is not None
