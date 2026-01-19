@@ -68,6 +68,8 @@ services:
       dockerfile: Dockerfile.cli       # ← can be the same as API or specialized
     image: myproject/cli:latest
     # No ports mapping - it's not a server
+    env_file:
+      .env
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       ENVIRONMENT: development
