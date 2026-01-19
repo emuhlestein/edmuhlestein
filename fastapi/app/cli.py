@@ -35,8 +35,17 @@ def show_env():
     # Method 2: If you use Pydantic Settings (recommended)
     typer.secho("From Settings object:", fg=typer.colors.CYAN, bold=True)
     typer.echo(f"DATABASE_URL       : {settings.DATABASE_URL}")
-    typer.echo(f"ENVIRONMENT        : {settings.ENVIRONMENT}")
+    typer.echo(f"POSTGRES_USER      : {settings.POSTGRES_USER}")
+    typer.echo(f"POSTGRES_DB      : {settings.POSTGRES_DB}")
+    typer.echo(f"POSTGRES_PASSWORD      : {settings.POSTGRES_PASSWORD}")
+    # typer.echo(f"ENVIRONMENT        : {settings.ENVIRONMENT}")
     typer.echo(f"DEBUG              : {settings.DEBUG}")
+
+    url = make_url(str(settings.DATABASE_URL))
+    typer.echo(f"URL : {url}")
+
+    admin_url = url.set(database="postgres")
+    typer.echo(f"ADMIN_URL : {admin_url}")
 
 @cli.command()
 def create_db():
