@@ -1,5 +1,6 @@
 from typing import Optional
 import typer
+import os
 from passlib.context import CryptContext
 from sqlalchemy import text, select
 from sqlalchemy import create_engine
