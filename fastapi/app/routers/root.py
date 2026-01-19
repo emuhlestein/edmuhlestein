@@ -7,7 +7,7 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(tags=["root"])
 
 @router.get("/", response_class=HTMLResponse, summary="Home page")
-async def read_root(request: Request):
+def read_root(request: Request):
     """
     Render the main landing page using Jinja2 template.
     Serves as a friendly welcome page with useful links.
