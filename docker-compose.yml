@@ -1,15 +1,81 @@
 services:
+  nginx:
+    build: ./nginx
+    image: edmuhlestein-nginx:latest
+    container_name: nginx-edmuhlestein
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt-conf:/etc/letsencrypt:ro
+      - letsencrypt-www:/var/www/certbot:ro
+    networks:
+      - ednet
 
   fastapi:
     build:
       context: ./fastapi
       dockerfile: Dockerfile
     container_name: fastapi-edmuhlestein
+    env_file:
+      - /etc/edmuhlestein.com/prod.env
     restart: unless-stopped
     expose:
-      - "8000"                         # Internal port (no external exposure)
+      - "8000"
     networks:
       - ednet
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - /etc/edmuhlestein.com/prod.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - ednet
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    command: |
+      -c "
+      trap exit TERM;
+
+      if [ ! -d /etc/letsencrypt/live/edmuhlestein.com ]; then
+        echo 'Obtaining initial certificate...';
+        certbot certonly --webroot -w /var/www/certbot -d edmuhlestein.com -d www.edmuhlestein.com --email emuhlestein@yahoo.com --agree-tos --no-eff-email --non-interactive || true;
+      fi;
+
+      echo 'Starting renewal loop';
+      while :; do
+        certbot renew --webroot -w /var/www/certbot --non-interactive --quiet || true;
+        echo 'Renewal check complete. Sleeping 12 hours...';
+        sleep 12h;
+      done
+      "
+    volumes:
+      - letsencrypt-conf:/etc/letsencrypt
+      - letsencrypt-www:/var/www/certbot
+    depends_on:
+      - nginx
+    networks:
+      - ednet
+
+volumes:
+  letsencrypt-conf:
+  letsencrypt-www:
+  db_data:
 
 networks:
   ednet:
