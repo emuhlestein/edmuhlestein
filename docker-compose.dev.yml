@@ -78,6 +78,8 @@ services:
         condition: service_healthy     # ← better startup reliability
     tty: true
     stdin_open: true                     # ← allows interactive shell
+    networks:
+      - ednet
     # no command → override when needed
 
 volumes:
