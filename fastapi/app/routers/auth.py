@@ -7,6 +7,7 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix="/auth", tags=["auth"])
 # router = APIRouter(tags=["auth"])
 
+# Show the login form
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request, error: str = None):
     try:
@@ -14,6 +15,7 @@ def login_page(request: Request, error: str = None):
     except Exception as e:
         return HTMLResponse(content=f"Template Error: {str(e)}", status_code=500)
 
+# Show registration form
 @router.get("/register", response_class=HTMLResponse)
 def register_page(request: Request, error: str = None):
     return templates.TemplateResponse("register.html", {"request": request, "error": error})

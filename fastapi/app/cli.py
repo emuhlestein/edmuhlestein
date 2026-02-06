@@ -40,6 +40,11 @@ def show_env():
     typer.echo(f"POSTGRES_PASSWORD      : {settings.POSTGRES_PASSWORD}")
     # typer.echo(f"ENVIRONMENT        : {settings.ENVIRONMENT}")
     typer.echo(f"DEBUG              : {settings.DEBUG}")
+    typer.echo(f"SECRET_KEY              : {settings.SECRET_KEY}")
+    typer.echo(f"ALGORITHM              : {settings.ALGORITHM}")
+    typer.echo(f"ACCESS_TOKEN_EXPIRE_MINUTES              : {settings.ACCESS_TOKEN_EXPIRE_MINUTES}")
+    typer.echo(f"REFRESH_TOKEN_EXPIRE_DAYS              : {settings.REFRESH_TOKEN_EXPIRE_DAYS}")
+
 
     url = make_url(str(settings.DATABASE_URL))
     typer.echo(f"URL : {url}")

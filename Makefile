@@ -4,6 +4,9 @@ down-dev:
 up-dev:
 	docker compose -f docker-compose.dev.yml up
 
+up-dev-build:
+	docker compose -f docker-compose.dev.yml up --build
+
 down-prod:
 	docker compose -f docker-compose.prod.yml down --profile prod --remove-orphans
 

@@ -3,7 +3,7 @@ This is a FastAPI web application. This is to help me learn Python.
 It uses Docker.
 **To run the web app in development:**  
 
- docker compose -f docker-compose.dev.yml up [-d] [--build]
+ docker compose -f docker-compose.dev.yml up [-d] [--build] [--no-cache]
 
  **To bring it down in development:**  
 
@@ -11,7 +11,7 @@ It uses Docker.
 
  **To run the web app in production:**  
 
- docker compose -f docker-compose.prod.yml up [-d] [--build] --profile prod  
+ docker compose -f docker-compose.prod.yml up [-d] [--build] [--no-cache] --profile prod  
 
 **To bring it down in production:**  
 
