@@ -1,7 +1,11 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, field_validator, Field
+from core.forms import as_form
+
+
+
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -116,3 +120,5 @@ class RegisterResponse(BaseModel):
     email: EmailStr
     # You usually do NOT return the password or token here
     # (token goes in cookie or separate field if API-style)
+
+as_form(RegisterForm)

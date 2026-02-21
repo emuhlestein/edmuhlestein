@@ -4,16 +4,16 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from app.core.security import create_access_token, get_password_hash, verify_password
-from app.core.config import settings
-from app.database import get_db
-from app.crud.user import get_user_by_email, create_user  # your CRUD functions
-from app.schemas.user import UserCreate  # your Pydantic model for registration
-from app.models.user import User
+from core.security import create_access_token, get_password_hash, verify_password
+from core.config import settings
+from database import get_db
+from services.user import get_user_by_email, create_user  # your CRUD functions
+from schemas.user import UserCreate  # your Pydantic model for registration
+from schemas.user import RegisterForm
+from models.user import User
 
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix="/auth", tags=["auth"])
-# router = APIRouter(tags=["auth"])
 
 # Show the login form
 @router.get("/login", response_class=HTMLResponse)
