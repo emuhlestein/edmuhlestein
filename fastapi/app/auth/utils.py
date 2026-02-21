@@ -3,7 +3,7 @@ from typing import Any
 
 import jwt  # or from jose import jwt if using python-jose
 
-from app.core.config import settings  # assuming settings has SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from core.config import settings  # assuming settings has SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 def create_access_token(
