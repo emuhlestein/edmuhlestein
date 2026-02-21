@@ -1,12 +1,21 @@
-from pathlib import Path
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from datetime import timedelta
+
+from app.core.security import create_access_token, get_password_hash, verify_password
+from app.core.config import settings
+from app.database import get_db
+from app.crud.user import get_user_by_email, create_user  # your CRUD functions
+from app.schemas.user import UserCreate  # your Pydantic model for registration
+from app.models.user import User
 
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix="/auth", tags=["auth"])
 # router = APIRouter(tags=["auth"])
 
+# Show the login form
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request, error: str = None):
     try:
@@ -14,8 +23,76 @@ def login_page(request: Request, error: str = None):
     except Exception as e:
         return HTMLResponse(content=f"Template Error: {str(e)}", status_code=500)
 
+# Show registration form
 @router.get("/register", response_class=HTMLResponse)
 def register_page(request: Request, error: str = None):
     return templates.TemplateResponse("register.html", {"request": request, "error": error})
 
-# POST handlers would go here (with actual user creation/login logic)
+@router.post("/register", response_class=HTMLResponse)
+def register_post(
+    request: Request,
+    form_data: RegisterForm = Depends(RegisterForm.as_form),  # ← magic line
+    db: Session = Depends(get_db)
+):
+    """
+    Handle registration form submission using a Pydantic model.
+    """
+    # 1. At this point, form_data is already validated by Pydantic
+    #    → email is valid EmailStr
+    #    → password >= 8 chars
+    #    → passwords match
+
+    # 2. Check if email already exists
+    if get_user_by_email(db, email=form_data.email):
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": "Email already registered",
+                "form_data": form_data.model_dump()  # preserve form values
+            },
+            status_code=400
+        )
+
+    # 3. Create new user
+    try:
+        user = create_user(
+            db,
+            email=form_data.email,
+            password=form_data.password,   # plain password — hash inside create_user
+            # username=... if you add it later
+        )
+    except Exception:
+        # In real app: log the error
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": "An error occurred during registration. Please try again.",
+                "form_data": form_data.model_dump()
+            },
+            status_code=500
+        )
+
+    # 4. Auto-login: create JWT
+    access_token = create_access_token(
+        subject=user.id,
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        extra_claims={"role": user.role}
+    )
+
+    # 5. Redirect with secure cookie
+    response = RedirectResponse(
+        url="/dashboard",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,           # False only for local dev without HTTPS
+        samesite="lax",
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+    return response

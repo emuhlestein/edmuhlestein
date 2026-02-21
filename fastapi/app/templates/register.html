@@ -10,7 +10,7 @@
     <div class="error">{{ error }}</div>
 {% endif %}
 
-<form method="post" action="/auth/register">
+<form class="mt" method="post" action="/auth/register">
     <div class="form-group">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required placeholder="johndoe">
@@ -35,7 +35,7 @@
 </form>
 
 <div class="links">
-    <p>Already have an account? <a href="/auth/login">Log in here</a></p>
-    <p><a href="/">← Back to Home</a></p>
+    <p>Already have an account? <a href="/auth/login" class="reg-link">Log in here</a></p>
+    <p><a href="/" class="reg-link">← Back to Home</a></p>
 </div>
 {% endblock %}
