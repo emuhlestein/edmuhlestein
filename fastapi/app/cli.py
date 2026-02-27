@@ -88,14 +88,16 @@ def reset_db():
 @cli.command()
 def seed_data():
     with SessionLocal() as session:
-        result = session.execute(select(User).where(User.email == "admin@example.com"))
-        admin = result.scalars().first()
+        # Modern 2.0 style
+        stmt = select(User).where(User.email == "admin@example.com")
+        admin = session.execute(stmt).scalars().one_or_none()
+
         if not admin:
             hashed_password = pwd_context.hash("admin123")
             new_admin = User(
                 email="admin@example.com",
                 hashed_password=hashed_password,
-                is_superuser=True,
+                user_role="admin",
             )
             session.add(new_admin)
             session.commit()
@@ -103,6 +105,80 @@ def seed_data():
         else:
             typer.echo("ℹ️ Admin user already exists.")
     
+# cli.py (add this command)
+
+@cli.command(name="dump-users")
+def dump_users(
+    limit: int = typer.Option(
+        50,
+        "--limit", "-l",
+        help="Maximum number of rows to show (0 = show all)"
+    ),
+    show_passwords: bool = typer.Option(
+        False,
+        "--show-passwords",
+        help="Also show hashed passwords (use with caution)"
+    )
+):
+    """
+    Display contents of the users table.
+    """
+    db = SessionLocal()
+    try:
+        query = db.query(User).order_by(User.id.asc())
+        
+        if limit > 0:
+            query = query.limit(limit)
+        
+        users = query.all()
+        
+        if not users:
+            typer.echo("No users found in the database.")
+            return
+        
+        # Header
+        header = f"{'ID':<6} {'Email':<30} {'Full Name':<20} {'Role':<12} {'Active':<8} {'Created At':<20}"
+        if show_passwords:
+            header += " Hashed Password (truncated)"
+        
+        typer.echo(header)
+        typer.echo("-" * (len(header) + 10))  # rough separator
+        
+        for user in users:
+            created = (
+                user.created_at.strftime("%Y-%m-%d %H:%M")
+                if user.created_at
+                else "—"
+            )
+            
+            line = (
+                f"{user.id:<6} "
+                f"{user.email:<30} "
+                f"{(user.full_name or '—'):<20} "
+                f"{(user.user_role or '—'):<12} "   # adjust if field name differs
+                f"{str(user.is_active):<8} "
+                f"{created:<20}"
+            )
+            
+            if show_passwords:
+                hashed_preview = (
+                    user.hashed_password[:20] + "..." 
+                    if user.hashed_password 
+                    else "—"
+                )
+                line += f" {hashed_preview}"
+            
+            typer.echo(line)
+        
+        typer.echo(f"\nTotal users shown: {len(users)}")
+        
+    except Exception as e:
+        typer.echo(f"Error: {str(e)}", err=True)
+    finally:
+        db.close()
+
+
+
 
 if __name__ == "__main__":
     cli()
