@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import timedelta
+from typing import Annotated
 
 from core.security import create_access_token, get_password_hash, verify_password
 from core.config import settings
@@ -31,9 +32,10 @@ def register_page(request: Request, error: str = None):
 @router.post("/register", response_class=HTMLResponse)
 def register_post(
     request: Request,
-    form_data: RegisterForm = Depends(RegisterForm.as_form),  # ← magic line
+    form_data: Annotated[RegisterForm, Form()],   # ← this line
     db: Session = Depends(get_db)
 ):
+
     """
     Handle registration form submission using a Pydantic model.
     """
