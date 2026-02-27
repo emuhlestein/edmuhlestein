@@ -21,7 +21,6 @@ docker compose -f docker-compose.prod.yml down --profile prod --remove-orphans
 
 docker compose -f docker-compose.prod.yml run --rm certbot certonly --webroot -w /var/www/certbot -d example.com
 
-
 **To show all CLI commands**
 docker compose -f docker-compose.dev.yml run --rm cli
 
