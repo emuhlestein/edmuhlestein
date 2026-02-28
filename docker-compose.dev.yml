@@ -2,14 +2,14 @@ services:
 
   fastapi:
     build:
-      context: ./fastapi
+      context: .
       dockerfile: Dockerfile
     container_name: fastapi_app
     ports:
       - "8000:8000"   # Expose FastAPI directly to localhost:8000
-    command: uvicorn fastapi.app.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
     volumes:
-      - ./fastapi/app:/app
+      - .:/app
     env_file:
       .env
     environment:
@@ -64,7 +64,7 @@ services:
 
   cli:
     build:
-      context: ./fastapi
+      context: .
       dockerfile: Dockerfile.cli       # ← can be the same as API or specialized
     image: myproject/cli:latest
     # No ports mapping - it's not a server

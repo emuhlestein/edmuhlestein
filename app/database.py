@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from typing import Generator
 from sqlalchemy.orm import Session
 
-from core.config import settings  # We'll define this next
+from .core.config import settings  # We'll define this next
 
 DATABASE_URL = settings.DATABASE_URL
 engine = create_engine(DATABASE_URL, echo=True, future=True)
