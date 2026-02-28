@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import Annotated
 
-from core.security import create_access_token, get_password_hash, verify_password
+from ..core.auth import create_access_token, get_password_hash, verify_password
 from core.config import settings
 from database import get_db
 from services.user import get_user_by_email, create_user  # your CRUD functions
@@ -23,6 +24,45 @@ def login_page(request: Request, error: str = None):
         return templates.TemplateResponse("login.html", {"request": request, "error": error})
     except Exception as e:
         return HTMLResponse(content=f"Template Error: {str(e)}", status_code=500)
+
+
+@router.post("/login", response_model=Token)
+def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db)
+):
+    # form_data.username is actually email in your case
+    user = db.query(User).filter(User.email == form_data.username).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user"
+        )
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email},  # or user.id if preferred
+        expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 
 # Show registration form
 @router.get("/register", response_class=HTMLResponse)
