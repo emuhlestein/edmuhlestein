@@ -7,14 +7,15 @@ from datetime import timedelta
 from typing import Annotated
 
 from ..core.auth import create_access_token, get_password_hash, verify_password
-from core.config import settings
-from database import get_db
-from services.user import get_user_by_email, create_user  # your CRUD functions
-from schemas.user import UserCreate  # your Pydantic model for registration
-from schemas.user import RegisterForm
-from models.user import User
+from ..core.config import settings
+from ..database import get_db
+from ..services.user import get_user_by_email, create_user  # your CRUD functions
+from ..schemas.user import UserCreate  # your Pydantic model for registration
+from ..schemas.user import RegisterForm
+from ..models.user import User
+from ..schemas.token import Token
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Show the login form

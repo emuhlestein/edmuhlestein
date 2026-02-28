@@ -24,5 +24,8 @@ docker compose -f docker-compose.prod.yml run --rm certbot certonly --webroot -w
 **To show all CLI commands**
 docker compose -f docker-compose.dev.yml run --rm cli
 
+**example**
+docker compose -f docker-compose.dev.yml run --rm cli show-env
+
 docker compose -f docker-compose.dev.yml build cli
 

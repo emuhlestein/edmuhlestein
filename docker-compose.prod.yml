@@ -15,7 +15,7 @@ services:
 
   fastapi:
     build:
-      context: ./fastapi
+      context: .
       dockerfile: Dockerfile
     container_name: fastapi-edmuhlestein
     env_file:
