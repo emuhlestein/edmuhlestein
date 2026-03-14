@@ -29,3 +29,6 @@ docker compose -f docker-compose.dev.yml run --rm cli show-env
 
 docker compose -f docker-compose.dev.yml build cli
 
+docker compose -f docker-compose.dev.yml run fastapi bash
+
+
