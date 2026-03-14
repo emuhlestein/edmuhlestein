@@ -2,9 +2,13 @@ from fastapi import Request
 
 def is_likely_browser(request: Request) -> bool:
     accept = request.headers.get("accept", "").lower()
+
+    print(request)
     
     # Primary check: wants HTML
-    wants_html = "text/html" in accept or "application/xhtml" in accept
+    wants_html = request.headers.get("HX-Request")
+
+    print("wants_html: " + wants_html)
     
     if not wants_html:
         return False

@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from .config import settings
+from .security import oauth2_scheme
 from ..database import get_db
 from ..models.user import User
 from ..schemas.token import TokenPayload  # Pydantic model for JWT payload
