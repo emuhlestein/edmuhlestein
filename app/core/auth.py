@@ -4,8 +4,6 @@ from typing import Any, List, Optional
 
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
@@ -13,18 +11,6 @@ from .config import settings
 from ..database import get_db
 from ..models.user import User
 from ..schemas.token import TokenPayload  # Pydantic model for JWT payload
-
-
-# ────────────────────────────────────────────────
-# Password hashing
-# ────────────────────────────────────────────────
-pwd_context = CryptContext(
-    schemes=["argon2", "bcrypt"],
-    deprecated="auto",
-    argon2__time_cost=2,
-    argon2__memory_cost=102400,
-    argon2__parallelism=8,
-)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -36,15 +22,36 @@ def get_password_hash(password: str) -> str:
     """Generate a secure hash for a password."""
     return pwd_context.hash(password)
 
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
+    """
+    Verify user credentials and return the user object if valid.
 
-# ────────────────────────────────────────────────
-# JWT handling
-# ────────────────────────────────────────────────
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="auth/login",
-    scheme_name="JWT",
-    description="JWT Authorization header using the Bearer scheme.",
-)
+    Returns:
+        User object if email exists and password is correct and account is active
+        None otherwise
+
+    Raises:
+        HTTPException: only in exceptional internal cases (rare)
+    """
+    # 1. Find user by email
+    user = db.query(User).filter(User.email == email).first()
+
+    # 2. No user → early return None (don't leak existence)
+    if not user:
+        return None
+
+    # 3. Verify password
+    if not pwd_context.verify(password, user.hashed_password):
+        return None
+
+    # 4. Check if account is active
+    if not user.is_active:
+        # You can raise here or return None depending on your preference
+        # Returning None is more common → login fails silently
+        return None
+
+    # 5. All checks passed → return the user
+    return user
 
 
 credentials_exception = HTTPException(
