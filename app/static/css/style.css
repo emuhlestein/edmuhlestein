@@ -236,3 +236,30 @@ button[type="submit"]:hover {
 .reg-link:visited {
 	color: #c084fc;
 }
+
+/* Error message / alert styling */
+.error-message,
+.alert-error {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #991b1b;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+/* Error message / alert styling */
+.error-message,
+.alert-error {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #991b1b;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
