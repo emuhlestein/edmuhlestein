@@ -2,8 +2,8 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime, timezone
+from ..core.utils import is_likely_browser, render_template
 
-templates = Jinja2Templates(directory="app/templates")
 router = APIRouter(tags=["root"])
 
 @router.get("/", response_class=HTMLResponse, summary="Home page")
@@ -14,18 +14,17 @@ def read_root(request: Request):
     """
     current_utc = datetime.now(timezone.utc)
 
-    context = {
-        "request": request,  # Always required for Jinja2 in FastAPI
-        "title": "FastAPI Task Manager",
-        "app_name": "Task Manager API",
-        "message": "Welcome to the FastAPI Task Manager API! 👋",
-        "version": "1.0.0",
-        "current_time": current_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
-        "current_year": current_utc.year,  # Useful for footer copyright
+    return render_template(
+        "index.html",
+        request,
+        title="FastAPI Task Manager",
+        app_name="Task Manager API",
+        message="Welcome to the FastAPI Task Manager API! 👋",
+        version="1.0.0",
+        current_time=current_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
+        current_year=current_utc.year,  # Useful for footer copyright
         # You can add more dynamic data here later
-    }
-
-    return templates.TemplateResponse("index.html", context)
+    )
 
 @router.get("/health", summary="Health check for monitoring")
 def health_check():
