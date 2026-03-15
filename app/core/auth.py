@@ -1,14 +1,14 @@
-# app/core/security.py
 from datetime import datetime, timedelta, timezone
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from jwt import PyJWTError
+from fastapi import Depends, HTTPException, status, Request
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from .config import settings
-from .security import oauth2_scheme
+from .security import oauth2_scheme, pwd_context
 from ..database import get_db
 from ..models.user import User
 from ..schemas.token import TokenPayload  # Pydantic model for JWT payload
@@ -161,21 +161,30 @@ def require_roles(required_roles: List[str]):
     return role_checker
 
 
-# ────────────────────────────────────────────────
-# Optional: Optional authentication (for public + logged-in routes)
-# ────────────────────────────────────────────────
-def get_optional_current_user(
-    token: Optional[str] = Depends(oauth2_scheme),
-    db: Session = Depends(get_db),
+def get_current_user_optional(
+    request: Request,
+    token: Annotated[str | None, Depends(oauth2_scheme)] = None,
+    db: Session = Depends(get_db)
 ) -> Optional[User]:
-    """
-    Returns current user if token is valid, None otherwise.
-    Useful for endpoints that work both authenticated and anonymously.
-    """
-    if token is None:
-        return None
+    if not token:
+        # Try cookie fallback
+        cookie_token = request.cookies.get("access_token")
+        if cookie_token and cookie_token.startswith("Bearer "):
+            token = cookie_token[7:]
+        else:
+            return None
 
     try:
-        return get_current_user(token=token, db=db)
-    except HTTPException:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
+        )
+        email: str = payload.get("sub")
+        if email is None:
+            return None
+    except PyJWTError:
         return None
+
+    user = db.query(User).filter(User.email == email).first()
+    return user

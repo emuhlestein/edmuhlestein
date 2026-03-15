@@ -1,4 +1,6 @@
 from fastapi import Request
+from ..core.auth import get_current_user_optional
+from ..templates.config import templates
 
 def is_likely_browser(request: Request) -> bool:
     accept = request.headers.get("accept", "").lower()
@@ -18,3 +20,16 @@ def is_likely_browser(request: Request) -> bool:
     is_suspicious = "postman" in user_agent or "insomnia" in user_agent
     
     return wants_html and not is_suspicious
+
+def render_template(
+    template_name: str,
+    request: Request,
+    **kwargs
+):
+    context = {
+        "request": request,
+        "current_user": get_current_user_optional(request),
+        **kwargs
+    }
+    return templates.TemplateResponse(template_name, context)
+
