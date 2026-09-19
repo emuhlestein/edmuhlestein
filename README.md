@@ -32,3 +32,8 @@ docker compose -f docker-compose.dev.yml build cli
 docker compose -f docker-compose.dev.yml run fastapi bash
 
 
+** Network **
+Remote context for VM: ssh://ed@192.168.1.19
+To access VM: ssh ed@192.168.1.19
+
+WSL2 Unbuntu is running on a different IP from my laptop.
