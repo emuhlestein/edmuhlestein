@@ -3,8 +3,8 @@
         up-prod-local down-prod-local \
         up-prod-remote down-prod-remote
 
-COMPOSE_DEV  := docker compose -f docker-compose.dev.yml
-COMPOSE_PROD := docker compose -f docker-compose.prod.yml
+COMPOSE_DEV  := docker compose -f docker-compose.dev.yml --env-file .env.dev
+COMPOSE_PROD := docker compose -f docker-compose.prod.yml --env-file .env.prod
 
 down-dev:
 	$(COMPOSE_DEV) down --remove-orphans
@@ -23,14 +23,14 @@ up-prod:
 
 # --- prod pinned to an engine ---
 up-prod-local:
-	docker --context default compose -f docker-compose.prod.yml --profile prod up -d --build
+	docker --context default compose -f docker-compose.prod.yml  up -d --build
 
 down-prod-local:
-	docker --context default compose -f docker-compose.prod.yml --profile prod down --remove-orphans
+	docker --context default compose -f docker-compose.prod.yml  down --remove-orphans
 
 up-prod-remote:
-	docker --context remote-prod compose -f docker-compose.prod.yml --profile prod up -d --build
+	docker --context remote-prod compose -f docker-compose.prod.yml  up -d --build
 
 down-prod-remote:
-	docker --context remote-prod compose -f docker-compose.prod.yml --profile prod down --remove-orphans
+	docker --context remote-prod compose -f docker-compose.prod.yml  down --remove-orphans
 

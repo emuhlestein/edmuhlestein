@@ -5,6 +5,7 @@ certs/
 
 # Environment files with secrets
 .env
+.env*
 *.env
 
 # OS / editor junk

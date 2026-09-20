@@ -31,6 +31,31 @@ docker compose -f docker-compose.dev.yml build cli
 
 docker compose -f docker-compose.dev.yml run fastapi bash
 
+**Up Dev Local**
+	docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build
+
+**Down Dev Local**
+	docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev down --remove-orphans
+
+**Up ev VM**
+	docker --context remote-prod compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build
+
+**Down Dev VM**
+	docker --context remote-prod compose -f docker-compose.dev.yml  --env-file .env.dev down --remove-orphans
+
+
+**Up Prod Local**
+	docker --context default compose -f docker-compose.prod.yml  --env-file .env.prod up -d --build
+
+**Down Prod Local**
+	docker --context default compose -f docker-compose.prod.yml  --env-file .env.prod down --remove-orphans
+
+**Up Prod VM**
+	docker --context remote-prod compose -f docker-compose.prod.yml  --env-file .env.prod up -d --build
+
+**Down Prod VM**
+	docker --context remote-prod compose -f docker-compose.prod.yml  --env-file .env.prod down --remove-orphans
+
 
 ** Network **
 Remote context for VM: ssh://ed@192.168.1.19
