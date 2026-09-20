@@ -17,9 +17,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: fastapi-edmuhlestein
-    env_file:
-      - /etc/edmuhlestein.com/prod.env
+    environment:
+      PYTHONPATH: /app
+    container_name: fastapi_app
     restart: unless-stopped
     expose:
       - "8000"
@@ -30,8 +30,6 @@ services:
     image: postgres:16-alpine
     container_name: postgres
     restart: unless-stopped
-    env_file:
-      - /etc/edmuhlestein.com/prod.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
