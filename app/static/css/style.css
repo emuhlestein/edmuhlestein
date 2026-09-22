@@ -263,3 +263,43 @@ button[type="submit"]:hover {
   font-weight: 500;
 }
 
+.card {
+  background: #1a222c;
+  border: 1px solid #2a3542;
+  border-radius: 16px;
+  padding: 1.45rem 1.55rem;
+  margin: 1.15rem 0;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.65rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #6ee7c5;
+}
+
+.card p {
+  margin: 0 0 0.9rem;
+  line-height: 1.65;
+}
+
+.card p:last-child {
+  margin-bottom: 0;
+}
+
+.card ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.card li {
+  margin: 0.35rem 0;
+}
+
+main {
+  width: min(740px, calc(100% - 2.5rem));
+  margin-inline: auto;
+  padding: 1.75rem 0 2.75rem;
+}
