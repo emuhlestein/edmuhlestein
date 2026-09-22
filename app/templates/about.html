@@ -1,0 +1,45 @@
+<!-- app/templates/about.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <section class="card">
+        <h2>Who</h2>
+        <p>
+            I’m Ed — a software developer based in Utah. After years of building
+            applications, I still prefer small, understandable systems over
+            stacking tools for their own sake.
+        </p>
+        <p>
+            This site is one of those systems: FastAPI, Postgres, and a short
+            path from an idea to a page on the web.
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>What this is</h2>
+        <ul>
+            <li>A personal home on the web, not a product landing page.</li>
+            <li>A place to practice production-shaped habits on a real stack.</li>
+            <li>Open enough to show the work; careful with anything private.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Now</h2>
+        <p>
+            Working with web apps, databases, and the operational side that
+            keeps them honest — compose files, secrets that stay on the server,
+            and pages that fail in obvious ways instead of silent ones.
+        </p>
+    </section>
+</main>
+
+<footer>
+    {% if current_user %}
+    Signed in as {{ current_user }}
+    {% else %}
+    &copy; Ed Muhlestein
+    {% endif %}
+</footer>
+{% endblock %}
