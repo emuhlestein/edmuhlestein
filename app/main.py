@@ -14,6 +14,7 @@ app.include_router(about_router)
 app.include_router(project_router)
 app.include_router(therapists_router)
 
+
 @app.on_event("startup")
 def on_startup():
     # Create tables if they don't exist (in production use Alembic migrations!)
