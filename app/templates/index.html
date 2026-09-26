@@ -1,1 +1,15 @@
 {% extends "base.html" %}
+
+{% block content %}
+    <section class="hero">
+        <div class="hero-image">
+            <img src="{{ url_for('static', path='/images/profile.jpg') }}" alt="Ed Muhlestein" class="profile-img">
+        </div>
+        <div class="hero-content">
+            <h1>Ed Muhlestein</h1>
+            <p class="lede">
+                Full-stack software engineer with strong expertise in backend development using Java, Spring MVC, and Oracle SQL.
+            </p>
+        </div>
+    </section>
+{% endblock %}
