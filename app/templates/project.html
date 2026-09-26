@@ -1,0 +1,81 @@
+<!-- app/templates/about.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <p class="about">Project</p>
+    <section class="card">
+        <h2>What</h2>
+        <p>
+           An indie game development project developed in collaboration by Ben, Nicholas, Tim, and Ed Muhlestein.
+        </p>
+    </section>
+    <section class="card">
+        <h2>To Do List</h2>
+         <div class="team-member">
+            <h3>Nick Muhlestein:</h3>
+            <ul class="task-list">
+                <li>
+                    <strong>Development Oversight:</strong> Directing production milestones, task prioritization, and team coordination.
+                </li>
+                <li>
+                    <strong>Project Coordinator:</strong> Streamlining team workflows and tracking feature completion.
+                </li>
+                <li>
+                    <strong>Scrum Master / Agile Lead:</strong> Managing sprint cycles, daily standups, and project delivery schedules.
+                </li>
+            </ul>
+        </div>
+        <div class="team-member">
+            <h3>Tim Muhlestein:</h3>
+            <ul class="task-list">
+                <li>
+                    <strong>Game Design & Mechanics:</strong> Conceptualizing core gameplay mechanics, level design, and creative direction.
+                </li>
+                <li>
+                    <strong>Game Design & Development:</strong> Driving game concepts, mechanics design, and core gameplay programming.
+                </li>
+                <li>
+                    <strong>Game Concept & Execution:</strong> Translating game ideas into playable prototypes and finished mechanics.
+                </li>
+            </ul>
+        </div>
+        <div class="team-member">
+            <h3>Ed Muhlestein:</h3>
+            <ul class="task-list">
+                <li>
+                    <strong>Project Infrastructure:</strong> Set up the agile project management framework and team workflow processes.
+                </li>
+                <li>
+                    <strong>Web Architecture:</strong> Design and build the full-stack website architecture to support project tracking.
+                </li>
+                <li>
+                    <strong>Deployment & Launcher:</strong> Develop a custom application launcher for automated game delivery and deployment.
+                </li>
+            </ul>
+        </div>
+        <div class="team-member">
+            <h3>Ben Muhlestein:</h3>
+            <ul class="task-list">
+                <li>
+                    <strong>Game Design & Concept Development:</strong> Conceptualizing core gameplay ideas, narrative themes, and initial mechanics.
+                </li>
+                <li>
+                    <strong>Lead Game Designer:</strong> Authoring core game concepts, world design, and gameplay rules.
+                </li>
+                <li>
+                    <strong>Creative Concept Developer:</strong> Turning high-level gameplay ideas into playable design specifications.
+                </li>
+            </ul>
+        </div>
+    </section>
+</main>
+
+<footer>
+    {% if current_user %}
+    Signed in as {{ current_user }}
+    {% else %}
+    &copy; Ed Muhlestein
+    {% endif %}
+</footer>
+{% endblock %}

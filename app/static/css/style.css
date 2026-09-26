@@ -303,3 +303,63 @@ main {
   margin-inline: auto;
   padding: 1.75rem 0 2.75rem;
 }
+
+.about {
+    font-size: 1.55rem;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    color: #6ee7c5;
+}
+
+footer {
+    color:gold;
+}
+
+.hero {
+    display: flex;
+    align-items: center;        /* Centers image and text relative to each other */
+    justify-content: center;     /* Centers the content block horizontally */
+    gap: 2.5rem;
+    min-height: calc(100vh - 80px); /* Fills screen height minus navbar height */
+    padding: 2rem;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-image img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%; /* Makes the image circular */
+    object-fit: cover;
+}
+
+/* Container for each team member's block */
+.team-member {
+    margin-bottom: 1.5rem;
+}
+
+.team-member h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Custom list styling for tasks */
+.task-list {
+    list-style-type: none; /* Removes default bullet points */
+    padding-left: 0;
+    margin-top: 0.5rem;
+}
+
+.task-list li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    color: #e2e8f0; /* Crisp, readable light text */
+}
+
+/* Highlighted blue category titles matching your page style */
+.task-list strong {
+    color: #38bdf8; /* Bright cyan/blue accent color */
+}

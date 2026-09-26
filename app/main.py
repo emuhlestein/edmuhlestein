@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .database import engine  # sync engine (sqlalchemy.create_engine)
 from .models.base import Base   # DeclarativeBase subclass
-from .routers import root_router, auth_router, about_router
+from .routers import root_router, auth_router, about_router, project_router, therapists_router
 
 app = FastAPI(debug=True)
 app.mount("/static", StaticFiles(directory="/app/app/static", html=True), name="static")
@@ -11,6 +11,9 @@ app.mount("/static", StaticFiles(directory="/app/app/static", html=True), name="
 app.include_router(root_router)
 app.include_router(auth_router)
 app.include_router(about_router)
+app.include_router(project_router)
+app.include_router(therapists_router)
+
 
 @app.on_event("startup")
 def on_startup():
