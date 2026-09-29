@@ -155,9 +155,27 @@ body {
 
 .container {
     display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.doc-wide {
+  align-self: center;
+  width: min(960px, calc(100% - 2rem));
+  max-width: 960px;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.doc-wide .form-group {
+  width: 100%;
+}
+
+.doc-wide .body-paste,
+.doc-wide input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Container Spacing */
