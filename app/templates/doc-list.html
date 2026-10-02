@@ -1,0 +1,29 @@
+{% extends "study_base.html" %}
+
+{% block content %}
+<h2>Document List</h2>
+
+{% if documents %}
+  <ul class="doc-list">
+  {% for doc in documents %}
+    <li>
+      <a href="/study/{{ doc.slug }}">{{ doc.title }}</a>
+      {% if doc.summary %}
+        <span class="doc-summary">{{ doc.summary }}</span>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>No documents yet.</p>
+{% endif %}
+
+<footer>
+    {% if current_user %}
+    Signed in as {{ current_user }}
+    {% else %}
+    &copy; Ed Muhlestein
+    {% endif %}
+</footer>
+{% endblock %}
+

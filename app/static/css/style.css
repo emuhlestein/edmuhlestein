@@ -381,3 +381,37 @@ footer {
 .task-list strong {
     color: #38bdf8; /* Bright cyan/blue accent color */
 }
+
+.doc-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  width: min(720px, 100%);
+}
+
+.doc-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.65rem;
+  background: #1a222c;
+  border: 1px solid #2a3542;
+  border-radius: 12px;
+}
+
+.doc-list a {
+  color: #e8eef4;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.doc-list a:hover {
+  color: #6ee7c5;
+}
+
+.doc-list .doc-summary {
+  color: #9aa8b5;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
