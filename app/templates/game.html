@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Run</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #111;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #quit {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 2;
+      padding: 8px 14px;
+      border: 0;
+      border-radius: 4px;
+      background: #333;
+      color: #eee;
+      font: 14px sans-serif;
+      cursor: pointer;
+    }
+    #quit:hover {
+      background: #444;
+    }
+    #waiting {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    color: #eee;
+    font: 18px sans-serif;
+    pointer-events: none;
+    animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <p id="waiting">Waiting for Node.js</p>
+  <button id="quit" type="button">Quit</button>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const waiting = document.getElementById("waiting");
+    const ctx = canvas.getContext("2d");
+    const matchId = "42";
+    const socket = new WebSocket("ws://localhost:2567/rooms/" + matchId);
+
+    const keys = {};
+
+    function fit() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function leave() {
+      socket.close();
+      window.location = "/project";
+    }
+
+    fit();
+    window.addEventListener("resize", fit);
+
+    window.addEventListener("keydown", (e) => {
+      keys[e.key] = true;
+      if (e.key === "Escape") leave();
+    });
+    window.addEventListener("keyup", (e) => {
+      keys[e.key] = false;
+    });
+
+    document.getElementById("quit").addEventListener("click", leave);
+
+    socket.onopen = () => {
+    waiting.remove();
+    setInterval(() => {
+        if (socket.readyState !== WebSocket.OPEN) return;
+        socket.send(JSON.stringify({
+        left: !!keys["ArrowLeft"],
+        right: !!keys["ArrowRight"],
+        jump: !!keys[" "]
+        }));
+    }, 50);
+    };
+
+    socket.onmessage = (event) => {
+      const state = JSON.parse(event.data);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ddd";
+      ctx.fillRect(state.player.x, state.player.y, 32, 32);
+      if (state.status === "finished") {
+        window.location = "/matches/" + matchId;
+      }
+    };
+
+    socket.onopen = () => {
+        waiting.remove();
+        // start sending keys
+    };
+
+    // socket.onerror = () => {
+    //     waiting.textContent = "Node.js did not connect";
+    // };
+  </script>
+</body>
+</html>
