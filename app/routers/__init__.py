@@ -4,6 +4,7 @@ from .auth import router as auth_router
 from .about import router as about_router
 from .project import router as project_router
 from .therapists import router as therapists_router
+from .study import router as study_router
 
 __all__ = [
     "root_router",
@@ -11,4 +12,5 @@ __all__ = [
     "about_router",
     "project_router",
     "therapists_router",
+    "study_router",
 ]
