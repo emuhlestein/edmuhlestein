@@ -1,6 +1,8 @@
 services:
   nginx:
-    build: ./nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
     image: edmuhlestein-nginx:latest
     container_name: nginx-edmuhlestein
     restart: unless-stopped
@@ -15,7 +17,7 @@ services:
 
   fastapi:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
     environment:
       PYTHONPATH: /app
@@ -34,6 +36,20 @@ services:
     restart: unless-stopped
     expose:
       - "8000"
+    networks:
+      - ednet
+
+  game:
+    profiles: ["prod"]
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    environment:
+      PORT: "2567"
+      NODE_ENV: production
+    ports:
+      - "2567:2567"
+    restart: always
     networks:
       - ednet
 
