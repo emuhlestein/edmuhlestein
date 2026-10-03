@@ -52,72 +52,56 @@
   </style>
 </head>
 <body>
-  <canvas id="game"></canvas>
+  <div id="game"></div>
   <p id="waiting">Waiting for Node.js</p>
   <button id="quit" type="button">Quit</button>
 
-  <script>
-    const canvas = document.getElementById("game");
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.min.js"></script>
+    <script>
     const waiting = document.getElementById("waiting");
-    const ctx = canvas.getContext("2d");
     const matchId = "42";
     const socket = new WebSocket("ws://localhost:2567/rooms/" + matchId);
-
-    const keys = {};
-
-    function fit() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+    let player;
 
     function leave() {
-      socket.close();
-      window.location = "/project";
+        socket.close();
+        window.location = "/project";
     }
-
-    fit();
-    window.addEventListener("resize", fit);
-
-    window.addEventListener("keydown", (e) => {
-      keys[e.key] = true;
-      if (e.key === "Escape") leave();
-    });
-    window.addEventListener("keyup", (e) => {
-      keys[e.key] = false;
-    });
 
     document.getElementById("quit").addEventListener("click", leave);
 
-    socket.onopen = () => {
-    waiting.remove();
-    setInterval(() => {
-        if (socket.readyState !== WebSocket.OPEN) return;
-        socket.send(JSON.stringify({
-        left: !!keys["ArrowLeft"],
-        right: !!keys["ArrowRight"],
-        jump: !!keys[" "]
-        }));
-    }, 50);
-    };
+    class RunScene extends Phaser.Scene {
+        constructor() {
+        super("run");
+        }
 
-    socket.onmessage = (event) => {
-      const state = JSON.parse(event.data);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#ddd";
-      ctx.fillRect(state.player.x, state.player.y, 32, 32);
-      if (state.status === "finished") {
-        window.location = "/matches/" + matchId;
-      }
-    };
+        create() {
+        player = this.add.rectangle(100, 200, 32, 32, 0x285cb0);
+        this.input.keyboard.on("keydown-ESC", leave);
 
-    socket.onopen = () => {
-        waiting.remove();
-        // start sending keys
-    };
+        socket.onopen = () => {
+            waiting.remove();
+        };
 
-    // socket.onerror = () => {
-    //     waiting.textContent = "Node.js did not connect";
-    // };
-  </script>
+        socket.onmessage = (event) => {
+            const state = JSON.parse(event.data);
+            player.x = state.player.x;
+            player.y = state.player.y;
+        };
+        }
+    }
+
+    new Phaser.Game({
+        type: Phaser.AUTO,
+        parent: "game",
+        backgroundColor: "#111111",
+        scale: {
+        mode: Phaser.Scale.RESIZE,
+        width: window.innerWidth,
+        height: window.innerHeight
+        },
+        scene: [RunScene]
+    });
+</script>
 </body>
 </html>
