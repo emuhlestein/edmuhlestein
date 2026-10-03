@@ -4,7 +4,7 @@ services:
   fastapi:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: app/Dockerfile
     container_name: fastapi_app
     env_file:
       .env.dev
@@ -15,6 +15,22 @@ services:
       - .:/app
     depends_on:
       - postgres
+    networks:
+      - ednet
+
+  game:
+    build:
+      context: .
+      dockerfile: node/Dockerfile
+    ports:
+      - "2567:2567"
+    environment:
+      PORT: "2567"
+    volumes:
+      - ./node:/app
+      - game_modules:/app/node_modules
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
     networks:
       - ednet
   
@@ -79,6 +95,7 @@ services:
 volumes:
   db_data:
   pgadmin-data:
+  game_modules:
 
 networks:
   ednet:

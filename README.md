@@ -37,7 +37,7 @@ docker compose -f docker-compose.dev.yml run fastapi bash
 **Down Dev Local**
 	docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev down --remove-orphans
 
-**Up ev VM**
+**Up dev VM**
 	docker --context remote-prod compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build
 
 **Down Dev VM**
