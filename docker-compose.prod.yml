@@ -17,8 +17,8 @@ services:
 
   fastapi:
     build:
-      context: ./app
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: app/Dockerfile
     environment:
       PYTHONPATH: /app
       POSTGRES_USER: ${POSTGRES_USER}
@@ -42,8 +42,8 @@ services:
   game:
     profiles: ["prod"]
     build:
-      context: ./node
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: node/Dockerfile
     environment:
       PORT: "2567"
       NODE_ENV: production
