@@ -16,7 +16,7 @@
       inset: 0;
       z-index: 0;
     }
-    #quit {
+    #reset, #quit {
       position: fixed;
       right: 16px;
       bottom: 16px;
@@ -30,6 +30,8 @@
       font: 14px sans-serif;
       cursor: pointer;
     }
+    #reset { right: 88px; }
+    #quit { right: 16px; }
     #quit:hover {
       background: #444;
     }
@@ -55,6 +57,7 @@
 <body>
   <div id="game"></div>
   <p id="waiting">Waiting for Node.js</p>
+  <button id="reset" type="button">Reset</button>
   <button id="quit" type="button" onclick="leave()">Quit</button>
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.min.js"></script>
@@ -62,6 +65,7 @@
   const waiting = document.getElementById("waiting");
   const matchId = "42";
   const socket = new WebSocket("ws://localhost:2567/rooms/" + matchId);
+  let touch = { left: false, right: false, jump: false };
   let player;
   let keys;
   let keysTimerStarted = false;
@@ -75,7 +79,20 @@
     if (waiting) waiting.remove();
   }
 
+  function sendView() {
+    if (socket.readyState !== WebSocket.OPEN) return;
+    socket.send(JSON.stringify({
+      resize: true,
+      width: this.scale.width,
+      height: this.scale.height
+    }));
+  }
+
   document.getElementById("quit").addEventListener("click", leave);
+  document.getElementById("reset").addEventListener("click", () => {
+    if (socket.readyState !== WebSocket.OPEN) return;
+    socket.send(JSON.stringify({ reset: true }));
+  });
   socket.onopen = clearWaiting;
 
   class RunScene extends Phaser.Scene {
@@ -87,20 +104,36 @@
       player = this.add.rectangle(200, 200, 32, 32, 0x285cb0);
       keys = this.input.keyboard.addKeys("LEFT,RIGHT,SPACE");
       this.input.keyboard.on("keydown-ESC", leave);
+      this.scale.on("resize", sendView, this);
+
+      let touch = { left: false, right: false, jump: false };
+
+      this.input.on("pointerdown", (pointer) => {
+        touch.left = pointer.x < this.scale.width / 2;
+        touch.right = !touch.left;
+        touch.jump = pointer.y < this.scale.height / 2;
+      });
+
+      this.input.on("pointerup", () => {
+        touch = { left: false, right: false, jump: false };
+      });
 
       const startSending = () => {
         if (keysTimerStarted) return;
         keysTimerStarted = true;
+        sendView.call(this);
         this.time.addEvent({
           delay: 50,
           loop: true,
           callback: () => {
             if (socket.readyState !== WebSocket.OPEN) return;
-            socket.send(JSON.stringify({
-              left: keys.LEFT.isDown,
-              right: keys.RIGHT.isDown,
-              jump: keys.SPACE.isDown
-            }));
+              const left = keys.LEFT.isDown || (!keys.RIGHT.isDown && touch.left);
+              const right = keys.RIGHT.isDown || (!keys.LEFT.isDown && touch.right);
+              socket.send(JSON.stringify({
+                left: left && !right,
+                right: right && !left,
+                jump: keys.SPACE.isDown || touch.jump
+              }));
           }
         });
       };

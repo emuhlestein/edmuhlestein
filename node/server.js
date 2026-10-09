@@ -60,6 +60,21 @@ wss.on("connection", (ws) => {
   ws.on("message", (data) => {
     try {
       const input = JSON.parse(data.toString());
+      if (input.resize) {
+        room.width = Number(input.width) || room.width;
+        room.height = Number(input.height) || room.height;
+        return;
+      }
+      if (input.reset) {
+        room.player.x = room.width/2;
+        room.player.y = room.height/2;
+        room.player.vy = 0;
+        room.input.left = false;
+        room.input.right = false;
+        room.input.jump = false;
+        broadcast(room);
+        return;
+      }
       room.input.left = !!input.left;
       room.input.right = !!input.right;
       room.input.jump = !!input.jump;
