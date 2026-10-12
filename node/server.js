@@ -19,50 +19,62 @@ function roomFor(id) {
       id,
       width: 800,
       height: 600,
-      player: { x: 100, y: 200 },
+      player: { x: 16, y: 200 },
       input: { left: false, right: false, jump: false },
       sockets: new Set(),
+      segments: [],
     };
     room.engine = Engine.create({ gravity: { x: 0, y: 1 } });
-    room.body = Bodies.rectangle(200, 200, 32, 32);
-    room.ground = Bodies.rectangle(400, 500, 10000, 40, { isStatic: true });
-    World.add(room.engine.world, [room.ground, room.body]);
+    room.body = Bodies.rectangle(16, 200, 32, 32);
+    World.add(room.engine.world, room.body);
+    layGround(room);
     rooms.set(id, room);
   }
   return room;
 }
 
-function makeGround(room) {
-  const width = room.width || 800;
-  const height = room.height || 600;
-  if (room.ground) {
-    World.remove(room.engine.world, room.ground);
-  }
-  room.ground = Bodies.rectangle(width / 2, height - 20, width, 40, {
-    isStatic: true
-  });
-  World.add(room.engine.world, room.ground);
+function addSegment(room, x, width, y, height, kind) {
+  const body = Bodies.rectangle(x + width / 2, y, width, height, { isStatic: true });
+  World.add(room.engine.world, body);
+  room.segments.push({ body, width, height, kind });
 }
 
-function placeGround(room) {
-  const width = room.width || 800;
-  const height = room.height || 600;
-  Matter.Body.setPosition(room.ground, {
-    x: width / 2,
-    y: height - 20
-  });
+function addObstacle(room, x, y) {
+  addSegment(room, x - 16, 32, y, 64, "obstacle");
+}
+
+function layGround(room) {
+  const height = 40;
+  const floor = (room.height || 600) - height / 2;
+  const target = room.width || 800;
+  let x = 0;
+  while (x < target) {
+    const gap = x > 200 && Math.random() < 0.2;
+    if (gap) {
+      x += 36;
+      continue;
+    }
+    const width = Math.min(160, target - x);
+    addSegment(room, x, width, floor, height, "ground");
+    if (x > 200 && Math.random() < 0.3) {
+      addObstacle(room, x + width / 2, floor - height / 2 - 32);
+    }
+    x += width;
+  }
+  room.end = x;
 }
 
 function broadcast(room) {
   const payload = JSON.stringify({
     status: "running",
     player: room.player,
-    ground: room.ground && {
-      x: room.ground.position.x,
-      y: room.ground.position.y,
-      width: room.width,
-      height: 40
-    }
+    ground: room.segments.map((s) => ({
+      x: s.body.position.x,
+      y: s.body.position.y,
+      width: s.width,
+      height: s.height,
+      kind: s.kind
+    }))
   });
   for (const socket of room.sockets) {
     if (socket.readyState === socket.OPEN) socket.send(payload);
@@ -104,26 +116,34 @@ wss.on("connection", (ws) => {
     // console.log("message", data.toString());
     try {
       const input = JSON.parse(data.toString());
-      if (input.resize) {
+     if (input.resize) {
         room.width = Number(input.width) || room.width;
         room.height = Number(input.height) || room.height;
-        makeGround(room);
+        for (const s of room.segments) World.remove(room.engine.world, s.body);
+        room.segments = [];
+        layGround(room);
+        broadcast(room);
         return;
       }
+
       if (input.reset) {
-        const x = (room.width || 800) / 2;
-        const y = (room.height || 600) / 2;
-        placeGround(room);
-        console.log("reset to", x, y, "canvas", room.width, room.height);
-        console.log("body before", room.body && room.body.position);
+        const groundHeight = 80;
+        const floor = (room.height || 600) - groundHeight;
+        const x = 16;
+        const y = floor - 16;
         Matter.Body.setPosition(room.body, { x, y });
         Matter.Body.setVelocity(room.body, { x: 0, y: 0 });
         room.player.x = x;
         room.player.y = y;
-        console.log("body after", room.body.position);
+        room.input.left = false;
+        room.input.right = false;
+        room.input.jump = false;
         broadcast(room);
         return;
       }
+      room.input.left = !!input.left;
+      room.input.right = !!input.right;
+      room.input.jump = !!input.jump;
     } catch {
       // ignore malformed input
     }
@@ -141,15 +161,15 @@ setInterval(() => {
     const body = room.body;
     if (!body) continue;
 
-    if (room.input.jump && body.position.y >= 470) {
-      Matter.Body.setVelocity(body, { x: body.velocity.x, y: -10 });
-      room.input.jump = false;
-    }
     if (room.input.left) {
-      Matter.Body.applyForce(body, body.position, { x: -0.002, y: 0 });
+      Matter.Body.applyForce(room.body, room.body.position, { x: -0.002, y: 0 });
     }
     if (room.input.right) {
-      Matter.Body.applyForce(body, body.position, { x: 0.002, y: 0 });
+      Matter.Body.applyForce(room.body, room.body.position, { x: 0.002, y: 0 });
+    }
+    if (room.input.jump && room.body.position.y >= (room.height || 600) - 80) {
+      Matter.Body.setVelocity(room.body, { x: room.body.velocity.x, y: -10 });
+      room.input.jump = false;
     }
 
     Engine.update(room.engine, 50);
