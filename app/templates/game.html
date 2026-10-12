@@ -67,6 +67,7 @@
   const socket = new WebSocket("ws://localhost:2567/rooms/" + matchId);
   let touch = { left: false, right: false, jump: false };
   let player;
+  let ground;
   let keys;
   let keysTimerStarted = false;
 
@@ -89,7 +90,10 @@
   }
 
   document.getElementById("quit").addEventListener("click", leave);
-  document.getElementById("reset").addEventListener("click", () => {
+  document.getElementById("reset").addEventListener("click", (event) => {
+    console.log("reset!!!!", event.data);
+    event.preventDefault();
+    event.stopPropagation();
     if (socket.readyState !== WebSocket.OPEN) return;
     socket.send(JSON.stringify({ reset: true }));
   });
@@ -103,6 +107,7 @@
     create() {
       player = this.add.rectangle(200, 200, 32, 32, 0x285cb0);
       keys = this.input.keyboard.addKeys("LEFT,RIGHT,SPACE");
+      ground = this.add.rectangle(400, 580, 800, 40, 0x67de18);
       this.input.keyboard.on("keydown-ESC", leave);
       this.scale.on("resize", sendView, this);
 
@@ -149,8 +154,13 @@
       }
 
       socket.onmessage = (event) => {
+        console.log("from node", event.data);
         const state = JSON.parse(event.data);
         if (!state.player) return;
+        if (state.ground && ground) {
+          ground.setPosition(state.ground.x, state.ground.y);
+          ground.setSize(state.ground.width, state.ground.height);
+        }
         player.x = state.player.x;
         player.y = state.player.y;
         if (state.status === "finished") {
