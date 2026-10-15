@@ -91,7 +91,7 @@ services:
   cli:
     build:
       context: .
-      dockerfile: Dockerfile.cli       # ← can be the same as API or specialized
+      dockerfile: app/Dockerfile.cli       # ← can be the same as API or specialized
     image: myproject/cli:latest
     # No ports mapping - it's not a server
     env_file:
