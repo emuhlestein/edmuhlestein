@@ -429,3 +429,11 @@ footer {
   text-transform: uppercase;
   text-decoration: none;
 }
+
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: block;
+}

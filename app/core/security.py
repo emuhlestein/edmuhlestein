@@ -19,4 +19,5 @@ oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="auth/login",
     scheme_name="JWT",
     description="JWT Authorization header using the Bearer scheme.",
+    auto_error=False,
 )

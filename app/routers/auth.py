@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 # from fastapi.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -62,15 +62,15 @@ def login(
         token = create_access_token(
             subject=user.email,
             expires_delta=access_token_expires,
-            extra_claims={"role": user.role}
+            extra_claims={"role": user.user_role}
         )
-        response = RedirectResponse("/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+        response = Response(status_code=200)
+        response.headers["HX-Redirect"] = "/"
         response.set_cookie(
-            key="access_token",
-            value=f"Bearer {token}",
+            "access_token",
+            f"Bearer {token}",
             httponly=True,
-            secure=False,          # True in production
-            samesite="lax"
+            samesite="lax",
         )
         return response
 

@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     # Core Application Settings
     APP_ENV: str = "dev"
     DEBUG: bool = False
+    SECRET_KEY: str
 
     # Postgres Credentials
     POSTGRES_USER: str

@@ -21,15 +21,11 @@ def is_likely_browser(request: Request) -> bool:
     
     return wants_html and not is_suspicious
 
-def render_template(
-    template_name: str,
-    request: Request,
-    **kwargs
-):
+def render_template(template_name: str, request: Request, **kwargs):
     context = {
         "request": request,
-        "current_user": get_current_user_optional(request),
-        **kwargs
+        "current_user": kwargs.pop("current_user", None),
+        **kwargs,
     }
     return templates.TemplateResponse(template_name, context)
 
