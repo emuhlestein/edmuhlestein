@@ -1,17 +1,19 @@
-from fastapi import APIRouter, Request
+from typing import Optional
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime, timezone
 from ..core.utils import is_likely_browser, render_template
+from ..core.auth import get_current_user_optional
+from ..models.user import User
 
 router = APIRouter(tags=["root"])
 
 @router.get("/", response_class=HTMLResponse, summary="Home page")
-def read_root(request: Request):
-    """
-    Render the main landing page using Jinja2 template.
-    Serves as a friendly welcome page with useful links.
-    """
+def read_root(
+    request: Request,
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
     current_utc = datetime.now(timezone.utc)
 
     return render_template(
@@ -22,8 +24,8 @@ def read_root(request: Request):
         message="Welcome to the FastAPI Task Manager API! 👋",
         version="1.0.0",
         current_time=current_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
-        current_year=current_utc.year,  # Useful for footer copyright
-        # You can add more dynamic data here later
+        current_year=current_utc.year,
+        current_user=current_user,
     )
 
 @router.get("/health", summary="Health check for monitoring")

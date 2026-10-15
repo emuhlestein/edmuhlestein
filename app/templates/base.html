@@ -23,6 +23,9 @@
         </button>
         <ul class="navbar-menu">
           <li><a href="/" class="active">Home</a></li>
+          {% if current_user and current_user.user_role|lower == "admin" %}
+            <li><a href="/admin">Admin</a></li>
+          {% endif %}
           <li><a href="/therapists">Therapists</a></li>
           <li><a href="/study">Study</a></li>
           <li><a href="/project">Project</a></li>

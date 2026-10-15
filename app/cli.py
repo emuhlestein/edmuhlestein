@@ -6,10 +6,10 @@ from sqlalchemy import text, select
 from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 
-from database import engine, SessionLocal      # sync engine + sessionmaker
-from models.base import Base
-from models.user import User
-from core.config import settings
+from .database import engine, SessionLocal
+from .models.base import Base
+from .models.user import User
+from .core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 cli = typer.Typer(help="Database Management CLI")
