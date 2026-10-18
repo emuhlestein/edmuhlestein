@@ -1,16 +1,22 @@
 import express from "express";
+import nunjucks from "nunjucks";
+import { indexRouter } from "./routes/index.js";
+import { healthRouter } from "./routes/health.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
 
-app.get("/", (_req, res) => {
-  res.type("html").send("<h1>Control</h1><p>Express is running.</p>");
+nunjucks.configure("views", {
+  autoescape: true,
+  express: app,
+  noCache: true,
 });
+app.set("view engine", "html");
+app.use("/static", express.static("public"));
 
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", service: "control" });
-});
+app.use("/", indexRouter);
+app.use("/", healthRouter);
 
 app.listen(port, "0.0.0.0", () => {
-  console.log(`control listening on ${port}`);
+  console.log(`listening on ${port}`);
 });

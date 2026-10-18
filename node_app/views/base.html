@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Node.js{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=1.7">
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/project">Project</a></li>
+      {% if current_user and current_user.user_role | lower == "admin" %}
+        <li><a href="/admin">Admin</a></li>
+      {% endif %}
+      {% if current_user %}
+        <li><a href="/auth/logout">Log out</a></li>
+      {% else %}
+        <li><a href="/auth/login">Log in</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
