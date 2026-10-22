@@ -55,7 +55,7 @@
   </style>
 </head>
 <body>
-  <div id="game"></div>
+  <div id="game" tabindex="-1"></div>
   <p id="waiting">Waiting for Node.js</p>
   <button id="reset" type="button">Reset</button>
   <button id="quit" type="button" onclick="leave()">Quit</button>
@@ -90,7 +90,11 @@
   }
 
   document.getElementById("quit").addEventListener("click", leave);
+  document.getElementById("game").addEventListener("pointerdown", (event) => {
+    event.currentTarget.focus({ preventScroll: true });
+  });
   document.getElementById("reset").addEventListener("click", (event) => {
+    event.currentTarget.blur();
     console.log("reset!!!!", event.data);
     event.preventDefault();
     event.stopPropagation();
