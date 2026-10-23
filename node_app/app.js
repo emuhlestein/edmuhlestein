@@ -12,7 +12,7 @@ nunjucks.configure("views", {
   noCache: true,
 });
 app.set("view engine", "html");
-app.use("/static", express.static("public"));
+app.use("/static", express.static("static"));
 
 app.use("/", indexRouter);
 app.use("/", healthRouter);
