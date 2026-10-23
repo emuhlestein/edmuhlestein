@@ -47,7 +47,7 @@ docker compose -f docker-compose.dev.yml run fastapi bash
 **Up Prod Local**
 	docker --context default compose -f docker-compose.prod.yml  --env-file .env.prod up -d --build
 
-**Down Prod Local**
+### Down Prod Local
 	docker --context default compose -f docker-compose.prod.yml  --env-file .env.prod down --remove-orphans
 
 **Up Prod VM**
@@ -56,6 +56,8 @@ docker compose -f docker-compose.dev.yml run fastapi bash
 **Down Prod VM**
 	docker --context remote-prod compose -f docker-compose.prod.yml  --env-file .env.prod down --remove-orphans
 
+### To run a sql script on postgres
+docker --context default compose -f docker-compose.dev.yml exec -T postgres psql -U postgres -d appdb -f - < 1.0.sql
 
 ** Network **
 Remote context for VM: ssh://ed@192.168.1.19
