@@ -8,10 +8,8 @@
     "postinstall": "prisma skills sync || exit 0"
   },
   "dependencies": {
-    "@prisma/client": "^7.10.1",
     "express": "^4.21.2",
     "nunjucks": "^3.2.4",
-    "pg": "^8.23.1",
-    "prisma": "^8.0.0-rc.27"
+    "pg": "^8.23.1"
   }
 }
