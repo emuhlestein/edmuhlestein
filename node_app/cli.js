@@ -1,5 +1,4 @@
 import pg from "pg";
-
 const { Client } = pg;
 
 async function withDb(fn) {
@@ -42,14 +41,12 @@ function printHelp() {
 }
 
 const [,, name] = process.argv;
-
 if (!name || name === "help") {
   printHelp();
   process.exit(0);
 }
 
 const command = commands[name];
-
 if (!command) {
   console.log("usage: node cli.js <command>");
   console.log("commands:", Object.keys(commands).join(", "));

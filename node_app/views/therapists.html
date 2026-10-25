@@ -1,0 +1,22 @@
+<!-- app/templates/about.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <p class="about">Therapist Profile</p>
+    <section class="card">
+        <h2>Bobi Muhlestein</h2>
+        <p>
+           Bobi is a Marriage and Family Therapist
+        </p>
+    </section>
+</main>
+
+<footer>
+    {% if current_user %}
+    Signed in as {{ current_user }}
+    {% else %}
+    &copy; Ed Muhlestein
+    {% endif %}
+</footer>
+{% endblock %}

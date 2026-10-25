@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Run</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #111;
+      overflow: hidden;
+    }
+    #game {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+    #reset, #quit {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1000;
+      pointer-events: auto;
+      padding: 8px 14px;
+      border: 0;
+      border-radius: 4px;
+      background: #333;
+      color: #eee;
+      font: 14px sans-serif;
+      cursor: pointer;
+    }
+    #reset { right: 88px; }
+    #quit { right: 16px; }
+    #quit:hover {
+      background: #444;
+    }
+    #waiting {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    color: #eee;
+    font: 18px sans-serif;
+    pointer-events: none;
+    animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <p id="waiting">Waiting for Node.js</p>
+  <button id="reset" type="button">Reset</button>
+  <button id="quit" type="button" onclick="leave()">Quit</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.min.js"></script>
+<script>
+  const waiting = document.getElementById("waiting");
+  const matchId = "42";
+  const socket = new WebSocket("ws://localhost:2567/rooms/" + matchId);
+  let player;
+  let groundSprites = new Map();
+  let scene;
+  let keys;
+  let keysTimerStarted = false;
+
+  function leave() {
+    if (socket.readyState === WebSocket.OPEN) socket.close();
+    window.location = "/project";
+  }
+
+  function clearWaiting() {
+    if (waiting) waiting.remove();
+  }
+
+  function sendView() {
+    if (socket.readyState !== WebSocket.OPEN) return;
+    socket.send(JSON.stringify({
+      resize: true,
+      width: this.scale.width,
+      height: this.scale.height
+    }));
+  }
+
+  document.getElementById("quit").addEventListener("click", leave);
+  document.getElementById("reset").addEventListener("click", (event) => {
+    console.log("reset!!!!", event.data);
+    event.preventDefault();
+    event.stopPropagation();
+    if (socket.readyState !== WebSocket.OPEN) return;
+    socket.send(JSON.stringify({ reset: true }));
+  });
+  socket.onopen = clearWaiting;
+
+  class RunScene extends Phaser.Scene {
+    constructor() {
+      super("run");
+    }
+
+    create() {
+      scene = this;
+      player = this.add.rectangle(200, 200, 32, 32, 0x285cb0);
+      keys = this.input.keyboard.addKeys("LEFT,RIGHT,SPACE");
+      this.input.keyboard.on("keydown-ESC", leave);
+      this.scale.on("resize", sendView, this);
+
+      let touch = { left: false, right: false, jump: false };
+
+      this.input.on("pointerdown", (pointer) => {
+        touch.left = pointer.x < this.scale.width / 2;
+        touch.right = !touch.left;
+        touch.jump = pointer.y < this.scale.height / 2;
+      });
+
+      this.input.on("pointerup", () => {
+        touch = { left: false, right: false, jump: false };
+      });
+
+      const startSending = () => {
+        if (keysTimerStarted) return;
+        keysTimerStarted = true;
+        sendView.call(this);
+        this.time.addEvent({
+          delay: 50,
+          loop: true,
+          callback: () => {
+            if (socket.readyState !== WebSocket.OPEN) return;
+              const left = keys.LEFT.isDown || (!keys.RIGHT.isDown && touch.left);
+              const right = keys.RIGHT.isDown || (!keys.LEFT.isDown && touch.right);
+              socket.send(JSON.stringify({
+                left: left && !right,
+                right: right && !left,
+                jump: keys.SPACE.isDown || touch.jump
+              }));
+          }
+        });
+      };
+
+      socket.onopen = () => {
+        clearWaiting();
+        startSending();
+      };
+
+      if (socket.readyState === WebSocket.OPEN) {
+        clearWaiting();
+        startSending();
+      }
+
+      socket.onmessage = (event) => {
+        const state = JSON.parse(event.data);
+        if (!state.player || !player) return;
+        player.x = state.player.x;
+        player.y = state.player.y;
+
+        if (!state.ground) return;
+        const seen = new Set();
+        for (const s of state.ground) {
+          const key = `${s.kind}:${s.x}:${s.y}`;
+          seen.add(key);
+          let rect = groundSprites.get(key);
+          if (!rect) {
+            const color = s.kind === "obstacle" ? 0x884444 : 0x336633;
+            rect = scene.add.rectangle(s.x, s.y, s.width, s.height, color);
+            groundSprites.set(key, rect);
+          }
+          rect.setPosition(s.x, s.y);
+        }
+        for (const [key, rect] of groundSprites) {
+          if (!seen.has(key)) {
+            rect.destroy();
+            groundSprites.delete(key);
+          }
+        }
+      };
+    }
+  }
+
+  new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: "game",
+    backgroundColor: "#111111",
+    scale: {
+      mode: Phaser.Scale.RESIZE,
+      width: window.innerWidth,
+      height: window.innerHeight
+    },
+    scene: [RunScene]
+  });
+</script>
+</body>
+</html>

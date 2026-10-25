@@ -61,6 +61,7 @@ services:
     environment:
       PORT: "3000"
       NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     ports:
       - "3000:3000"
     restart: always
