@@ -109,6 +109,8 @@
     }
 
     create() {
+      console.log("NEW GAME CODE LOADED")
+
       scene = this;
       player = this.add.rectangle(200, 200, 32, 32, 0x285cb0);
       keys = this.input.keyboard.addKeys("LEFT,RIGHT,SPACE");
@@ -127,6 +129,10 @@
         touch = { left: false, right: false, jump: false };
       });
 
+      this.input.gamepad.on("down", (pad, button) => {
+        this.activePad = pad;
+      });
+
       const startSending = () => {
         if (keysTimerStarted) return;
         keysTimerStarted = true;
@@ -136,13 +142,15 @@
           loop: true,
           callback: () => {
             if (socket.readyState !== WebSocket.OPEN) return;
-            const pad = this.input.gamepad.getPad(0);
+            const pad = this.activePad?.connected
+              ? this.activePad
+              : this.input.gamepad.getAll()[0];
             const stickX = pad?.leftStick?.x ?? 0;
 
             const controllerLeft = stickX < -0.25 || (pad?.left ?? false);
             const controllerRight = stickX > 0.25 || (pad?.right ?? false);
 
-            const controllerJump = pad?.A ?? false;
+            const controllerJump = pad?.buttons?.[0]?.pressed ?? false;
 
             const left = keys.LEFT.isDown || touch.left || controllerLeft;
             const right = keys.RIGHT.isDown || touch.right || controllerRight;
