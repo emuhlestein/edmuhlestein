@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, List, Optional, Annotated
 
-import jwt
-from jwt import PyJWTError
 from fastapi import Depends, HTTPException, status, Request
 from pydantic import ValidationError
 from sqlalchemy.orm import Session

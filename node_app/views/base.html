@@ -1,28 +1,44 @@
+<!-- app/templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Node.js{% endblock %}</title>
+    <title>{% block title %}Ed Muhlestein{% endblock %}</title>
     <link rel="stylesheet" href="/static/css/style.css?v=1.7">
+
+    <!-- HTMX goes here (local version) -->
+    <script src="/static/js/htmx.min.js"></script>
 </head>
 <body>
-  <nav>
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/project">Project</a></li>
-      {% if current_user and current_user.user_role | lower == "admin" %}
-        <li><a href="/admin">Admin</a></li>
-      {% endif %}
-      {% if current_user %}
-        <li><a href="/auth/logout">Log out</a></li>
-      {% else %}
-        <li><a href="/auth/login">Log in</a></li>
-      {% endif %}
-    </ul>
-  </nav>
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+    <nav class="navbar">
+      {% block nav %}
+      <div class="navbar-container">
+        <a href="/"
+          class="navbar-logo">Ed Muhlestein</a>
+        <button class="navbar-toggle">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <ul class="navbar-menu">
+          <li><a href="/" class="active">Home</a></li>
+          {% if role == "admin" %}
+            <li><a href="/admin">Admin</a></li>
+          {% endif %}
+          <li><a href="/therapists">Therapists</a></li>
+          <li><a href="/study">Study</a></li>
+          <li><a href="/project">Project</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/auth/login">Login</a></li>
+        </ul>
+      </div>
+      {% endblock %}
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="/static/js/script.js"></script>
 </body>
 </html>

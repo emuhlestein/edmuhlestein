@@ -40,7 +40,6 @@ services:
       - ednet
 
   game:
-    profiles: ["prod"]
     build:
       context: .
       dockerfile: node/Dockerfile
@@ -54,13 +53,15 @@ services:
       - ednet
 
   node_app:
-    profiles: ["prod"]
     build:
       context: .
       dockerfile: node_app/Dockerfile
+    env_file:
+      .env.dev
     environment:
       PORT: "3000"
       NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     ports:
       - "3000:3000"
     restart: always
