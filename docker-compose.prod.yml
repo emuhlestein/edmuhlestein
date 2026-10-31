@@ -40,7 +40,6 @@ services:
       - ednet
 
   game:
-    profiles: ["prod"]
     build:
       context: .
       dockerfile: node/Dockerfile
@@ -54,10 +53,11 @@ services:
       - ednet
 
   node_app:
-    profiles: ["prod"]
     build:
       context: .
       dockerfile: node_app/Dockerfile
+    env_file:
+      .env.dev
     environment:
       PORT: "3000"
       NODE_ENV: production

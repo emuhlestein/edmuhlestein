@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";          // or your existing hash helpers
 import { getUserByEmail, createUser, authenticateUser } from "../services/user.js";
 
@@ -31,13 +30,10 @@ export async function loginPost(req, res) {
     });
   }
 
-  const token = jwt.sign(
-    { sub: user.email, role: user.user_role },
-    settings.jwtSecret,
-    { expiresIn: `${TOKEN_MINUTES}m` }
-  );
+  req.session.userId = user.id;
+  req.session.email = user.email;
+  req.session.role = user.user_role;
 
-  setTokenCookie(res, token);
   res.redirect("/");
 }
 
@@ -80,12 +76,9 @@ export async function registerPost(req, res) {
     });
   }
 
-  const token = jwt.sign(
-    { sub: user.id, role: user.role },
-    JWT_SECRET,
-    { expiresIn: `${TOKEN_MINUTES}m` }
-  );
+  req.session.userId = user.id;
+  req.session.email = user.email;
+  req.session.role = user.role;
 
-  setTokenCookie(res, token);
   res.redirect("/dashboard");
 }
