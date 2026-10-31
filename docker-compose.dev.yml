@@ -100,7 +100,7 @@ services:
     image: myproject/cli:latest
     # No ports mapping - it's not a server
     env_file:
-      .env
+      .env.dev
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       ENVIRONMENT: development
