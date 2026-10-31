@@ -4,12 +4,8 @@ import Matter from "matter-js";
 
 
 const { Engine, Bodies, World } = Matter;
-
-const engine = Engine.create({ gravity: { x: 0, y: 1 } });
-const ground = Bodies.rectangle(400, 500, 800, 40, { isStatic: true });
-const player = Bodies.rectangle(200, 200, 32, 32);
-World.add(engine.world, [ground, player]);
 const port = Number(process.env.PORT || 2567);
+const TICK_MS = 1000 / 60;
 const rooms = new Map();
 
 function roomFor(id) {
@@ -21,11 +17,13 @@ function roomFor(id) {
       height: 600,
       player: { x: 16, y: 200 },
       input: { left: false, right: false, jump: false },
+      jumpQueued: false,
       sockets: new Set(),
       segments: [],
     };
-    room.engine = Engine.create({ gravity: { x: 0, y: 1 } });
+    room.engine = Engine.create({ gravity: { x: 0, y: 2 } });
     room.body = Bodies.rectangle(16, 200, 32, 32);
+    Matter.Body.setInertia(room.body, Infinity);
     World.add(room.engine.world, room.body);
     layGround(room);
     rooms.set(id, room);
@@ -138,11 +136,15 @@ wss.on("connection", (ws) => {
         room.input.left = false;
         room.input.right = false;
         room.input.jump = false;
+        room.jumpQueued = false;
         broadcast(room);
         return;
       }
       room.input.left = !!input.left;
       room.input.right = !!input.right;
+      if (input.jump && !room.input.jump) {
+        room.jumpQueued = true;
+      }
       room.input.jump = !!input.jump;
     } catch {
       // ignore malformed input
@@ -161,23 +163,45 @@ setInterval(() => {
     const body = room.body;
     if (!body) continue;
 
-    if (room.input.left) {
-      Matter.Body.applyForce(room.body, room.body.position, { x: -0.002, y: 0 });
-    }
-    if (room.input.right) {
-      Matter.Body.applyForce(room.body, room.body.position, { x: 0.002, y: 0 });
-    }
-    if (room.input.jump && room.body.position.y >= (room.height || 600) - 80) {
+    const targetX = (Number(room.input.right) - Number(room.input.left)) * 6;
+    const response = targetX === 0 ? 0.85 : 0.55;
+    const nextX = body.velocity.x + (targetX - body.velocity.x) * response;
+
+    Matter.Body.setVelocity(body, {
+      x: nextX,
+      y: body.velocity.y
+    });
+
+    const grounded = room.engine.pairs.list.some((pair) => {
+
+      if (!pair.isActive) return false;
+
+      const playerIsA = pair.bodyA === body;
+      const playerIsB = pair.bodyB === body;
+      if (!playerIsA && !playerIsB) return false;
+
+      const other = playerIsA ? pair.bodyB : pair.bodyA;
+      const normalY = playerIsA
+        ? pair.collision.normal.y
+        : -pair.collision.normal.y;
+
+      return other.isStatic && normalY < -0.5;
+    });
+
+    const shouldJump = room.jumpQueued && grounded;
+
+    room.jumpQueued = false;
+
+    if (shouldJump) {
       Matter.Body.setVelocity(room.body, { x: room.body.velocity.x, y: -10 });
-      room.input.jump = false;
     }
 
-    Engine.update(room.engine, 50);
+    Engine.update(room.engine, TICK_MS);
     room.player.x = body.position.x;
     room.player.y = body.position.y;
     broadcast(room);
   }
-}, 50);
+}, TICK_MS);
 
 server.listen(port, "0.0.0.0", () => {
   console.log(`game server listening on ${port}`);
