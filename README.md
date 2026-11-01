@@ -36,6 +36,9 @@ docker compose -f docker-compose.dev.yml run fastapi bash
 ### Up Dev Local
 docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build
 
+### Up Dev Local for node_app (could be any service)
+docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build node_app
+
 ### Down Dev Local
 docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev down --remove-orphans
 
