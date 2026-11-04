@@ -55,7 +55,7 @@
   </style>
 </head>
 <body>
-  <div id="game"></div>
+  <div id="game" tabindex="-1"></div>
   <p id="waiting">Waiting for Node.js</p>
   <button id="reset" type="button">Reset</button>
   <button id="quit" type="button" onclick="leave()">Quit</button>
@@ -90,8 +90,11 @@
   }
 
   document.getElementById("quit").addEventListener("click", leave);
+  document.getElementById("game").addEventListener("pointerdown", (event) => {
+    event.currentTarget.focus({ preventScroll: true });
+  });
   document.getElementById("reset").addEventListener("click", (event) => {
-    console.log("reset!!!!", event.data);
+    event.currentTarget.blur();
     event.preventDefault();
     event.stopPropagation();
     if (socket.readyState !== WebSocket.OPEN) return;
@@ -123,6 +126,10 @@
         touch = { left: false, right: false, jump: false };
       });
 
+      this.input.gamepad.on("down", (pad, button) => {
+        this.activePad = pad;
+      });
+
       const startSending = () => {
         if (keysTimerStarted) return;
         keysTimerStarted = true;
@@ -132,13 +139,25 @@
           loop: true,
           callback: () => {
             if (socket.readyState !== WebSocket.OPEN) return;
-              const left = keys.LEFT.isDown || (!keys.RIGHT.isDown && touch.left);
-              const right = keys.RIGHT.isDown || (!keys.LEFT.isDown && touch.right);
-              socket.send(JSON.stringify({
-                left: left && !right,
-                right: right && !left,
-                jump: keys.SPACE.isDown || touch.jump
-              }));
+            const pad = this.activePad?.connected
+              ? this.activePad
+              : this.input.gamepad.getAll().find(p => p.connected);
+            const stickX = pad?.leftStick?.x ?? 0;
+
+            const controllerLeft = stickX < -0.25 || (pad?.left ?? false);
+            const controllerRight = stickX > 0.25 || (pad?.right ?? false);
+
+            const controllerJump = pad?.buttons?.[0]?.pressed ?? false;
+
+            const left = keys.LEFT.isDown || touch.left || controllerLeft;
+            const right = keys.RIGHT.isDown || touch.right || controllerRight;
+            const jump = keys.SPACE.isDown || touch.jump || controllerJump;
+
+            socket.send(JSON.stringify({
+              left: left && !right,
+              right: right && !left,
+              jump
+            }));
           }
         });
       };
@@ -186,6 +205,9 @@
     type: Phaser.AUTO,
     parent: "game",
     backgroundColor: "#111111",
+    input: {
+      gamepad: true,
+    },
     scale: {
       mode: Phaser.Scale.RESIZE,
       width: window.innerWidth,
