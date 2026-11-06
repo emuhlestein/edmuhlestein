@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";          // or your existing hash helpers
 import { getUserByEmail, createUser, authenticateUser } from "../services/user.js";
 
 const TOKEN_MINUTES = Number(process.env.ACCESS_TOKEN_EXPIRE_MINUTES || 15);
