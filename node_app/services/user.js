@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
 // import { db } from "../db.js";          // your pg pool or query helper
 // import { users } from "../schema.js";   // if using an ORM
