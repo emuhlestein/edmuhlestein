@@ -1,6 +1,7 @@
 import express from "express";
 import session from "express-session";
 import nunjucks from "nunjucks";
+import { settings } from "./settings.js";
 import { indexRouter } from "./routes/index.js";
 import { healthRouter } from "./routes/health.js";
 import { therapistsRouter } from "./routes/therapists.js";
@@ -12,24 +13,33 @@ import { authRouter } from "./routes/auth.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
+const isProduction = settings.nodeEnv === "production";
 
 nunjucks.configure("views", {
   autoescape: true,
   express: app,
-  noCache: true,
+  noCache: !isProduction,
 });
 
+// Middleware
+app.set("trust proxy", 1);   // trust the first proxy (nginx)
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || "dev-secret-change-me",
+  secret: settings.secretKey || "dev-secret-change-me",
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }   // true only if you are on HTTPS
+  cookie: {
+    secure: isProduction,   // only send over HTTPS
+    httpOnly: true,         // JavaScript cannot read it-for XSS
+    sameSite: "lax"         // limited cross-site sending
+  }
 }));
 app.use(express.json());                          // parses JSON bodies
 app.use(express.urlencoded({ extended: true }));  // parses form bodies
-app.set("view engine", "html");
+app.set("view engine", "html"); // don't need to include .html when calling res.render(). html is the expect extension
 app.use("/static", express.static("static"));
 
+// Routes
 app.use("/", indexRouter);
 app.use("/", healthRouter);
 app.use("/therapists", therapistsRouter);

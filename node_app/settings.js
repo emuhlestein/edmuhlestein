@@ -10,6 +10,7 @@ export const settings = {
   databaseUrl: required("DATABASE_URL"),
   debug: process.env.DEBUG === "True" || process.env.DEBUG === "true",
   secretKey: required("SECRET_KEY"),
+  nodeEnv: process.env.NODE_ENV || "development",
   algorithm: process.env.ALGORITHM || "HS256",
   accessTokenExpireMinutes: Number(process.env.ACCESS_TOKEN_EXPIRE_MINUTES) || 15,
   refreshTokenExpireDays: Number(process.env.REFRESH_TOKEN_EXPIRE_DAYS) || 5,

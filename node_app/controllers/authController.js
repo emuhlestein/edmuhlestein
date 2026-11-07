@@ -12,7 +12,7 @@ function setTokenCookie(res, token) {
 }
 
 export function loginPage(req, res) {
-  res.render("login.html", {
+  res.render("login", {
     error: req.query.error || null,
     email: req.query.email || "",
   });

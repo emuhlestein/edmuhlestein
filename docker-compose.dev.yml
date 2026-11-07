@@ -43,6 +43,7 @@ services:
     env_file:
       .env.dev
     environment:
+      NODE_ENV: development
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       PORT: "3000"
     volumes:
