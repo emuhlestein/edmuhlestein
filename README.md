@@ -1,10 +1,19 @@
-This is a FastAPI web application. This is to help me learn Python.  
+### Description
+* This is a Node.js-based web microservice application.  
+* Node.js is the main web interface. A second Node.js service is the game engine.  
+* The FastAPI service is for AI services.  
+* The database service is Postgres.  
+* The web servce is Nginx.  
 
-It uses Docker.
-**To run the web app in development:**  
+Docker compose is used to manage the services.  
 
- docker compose -f docker-compose.dev.yml up [-d] [--build] [--no-cache]
+### Getting started  
+1. clone the repo: https://github.com/emuhlestein/edmuhlestein.git  
+2. Initialize the database: docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev run --rm cli reset-db  
+3. Add the admin user: docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev run --rm cli seed-data  
+4. Run the website: docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build
 
+### Useful commands
  **To bring it down in development:**  
 
  docker compose -f docker-compose.dev.yml down --remove-orphans  
@@ -101,3 +110,4 @@ WSL2 Unbuntu is running on a different IP from my laptop.
 
 nginx terminates HTTPS and forwards the request to your Node container over plain HTTP. Without trust proxy, Express thinks every request is HTTP, so a secure: true cookie is never set and the browser never receives a session.  
 trust proxy: 1 tells Express to look at the X-Forwarded-Proto header that nginx already sends and treat the original request as HTTPS when that header says https.Place the line anywhere before app.use(session(...)) and it will take effect.
+

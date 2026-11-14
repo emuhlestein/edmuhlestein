@@ -1,13 +1,11 @@
 import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
-// import { db } from "../db.js";          // your pg pool or query helper
-// import { users } from "../schema.js";   // if using an ORM
 
 const SALT_ROUNDS = 10;
 
 export async function getUserByEmail(email) {
   const result = await pool.query(
-    "SELECT id, email, hashed_password, full_name FROM users WHERE email = $1 LIMIT 1",
+    "SELECT id, email, hashed_password, full_name, user_role FROM users WHERE email = $1 LIMIT 1",
     [email]
   );
   return result.rows[0] || null;
@@ -23,37 +21,41 @@ export async function createUser({ email, password, full_name }) {
 
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-  // Example insert
-  // const result = await db.query(
-  //   `INSERT INTO users (email, hashed_password, full_name)
-  //    VALUES ($1, $2, $3)
-  //    RETURNING *`,
-  //   [email, hashedPassword, full_name]
-  // );
-  // return result.rows[0];
+  const result = await pool.query(
+    `INSERT INTO users (email, hashed_password, full_name)
+     VALUES ($1, $2, $3)
+     RETURNING id, email, full_name`,
+    [email, hashedPassword, full_name]
+  );
 
-  // Placeholder — replace with your actual insert
-  return { id: 1, email, hashed_password: hashedPassword, full_name };
+  return result.rows[0];
 }
 
 export async function userExists({ email, username, userId } = {}) {
   if (!email && !username && !userId) return false;
 
-  // Build a simple existence check
-  // const conditions = [];
-  // const values = [];
-  // let i = 1;
-  // if (email) { conditions.push(`email = $${i++}`); values.push(email); }
-  // if (username) { conditions.push(`username = $${i++}`); values.push(username); }
-  // if (userId) { conditions.push(`id = $${i++}`); values.push(userId); }
-  //
-  // const result = await db.query(
-  //   `SELECT 1 FROM users WHERE ${conditions.join(" AND ")} LIMIT 1`,
-  //   values
-  // );
-  // return result.rows.length > 0;
+  const conditions = [];
+  const params = [];
 
-  return false;
+  if (email) {
+    params.push(email);
+    conditions.push(`email = $${params.length}`);
+  }
+  if (username) {
+    params.push(username);
+    conditions.push(`username = $${params.length}`);
+  }
+  if (userId) {
+    params.push(userId);
+    conditions.push(`id = $${params.length}`);
+  }
+
+  const result = await pool.query(
+    `SELECT 1 FROM users WHERE ${conditions.join(" OR ")} LIMIT 1`,
+    params
+  );
+
+  return result.rows.length > 0;
 }
 
 export async function authenticateUser(email, password) {
