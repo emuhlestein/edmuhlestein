@@ -73,7 +73,7 @@ docker --context default compose -f docker-compose.dev.yml ps
 ### Down Prod Local
 	docker --context default compose -f docker-compose.prod.yml  --env-file .env.prod down --remove-orphans
 
-**Up Prod VM**
+### Up Prod VM
 	docker --context remote-prod compose -f docker-compose.prod.yml  --env-file .env.prod up -d --build
 
 **Down Prod VM**

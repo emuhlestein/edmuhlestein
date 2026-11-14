@@ -8,5 +8,5 @@ RUN npm ci --omit=dev
 # Copy the entire application
 COPY node_app/ .
 
-EXPOSE 3000
+EXPOSE 8000
 ENTRYPOINT ["./entrypoint.sh"]
