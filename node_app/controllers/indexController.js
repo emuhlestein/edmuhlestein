@@ -4,5 +4,6 @@ export function showHome(req, res) {
   res.render("index.html", {
     title: "Home",
     role,
+    isLoggedIn: !!req.session?.userId
   });
 }

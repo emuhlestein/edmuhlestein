@@ -23,15 +23,20 @@
         </button>
         <ul class="navbar-menu">
           <li><a href="/" class="active">Home</a></li>
-          <li>DEBUG role: {{ role }}</li>
-          {% if role == "admin" %}
-            <li><a href="/admin">Admin</a></li>
+          {% if isLoggedIn %}
+            {% if role == "admin" %}
+              <li><a href="/admin">Admin</a></li>
+            {% endif %}
           {% endif %}
           <li><a href="/therapists">Therapists</a></li>
           <li><a href="/study">Study</a></li>
           <li><a href="/project">Project</a></li>
           <li><a href="/about">About</a></li>
-          <li><a href="/auth/login">Login</a></li>
+           {% if isLoggedIn %}
+            <li><a href="/auth/logout">Log Off</a></li>
+          {% else %}
+            <li><a href="/auth/login">Login</a></li>
+          {% endif %}
         </ul>
       </div>
       {% endblock %}

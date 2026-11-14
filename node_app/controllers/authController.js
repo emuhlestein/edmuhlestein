@@ -74,3 +74,9 @@ export async function registerPost(req, res) {
 
   res.redirect("/dashboard");
 }
+
+export function logout(req, res) {
+  req.session.destroy(() => {
+    res.redirect("/");
+  });
+}
