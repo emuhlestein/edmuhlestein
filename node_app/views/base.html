@@ -23,6 +23,7 @@
         </button>
         <ul class="navbar-menu">
           <li><a href="/" class="active">Home</a></li>
+          <li>DEBUG role: {{ role }}</li>
           {% if role == "admin" %}
             <li><a href="/admin">Admin</a></li>
           {% endif %}

@@ -1,16 +1,5 @@
 import { getUserByEmail, createUser, authenticateUser } from "../services/user.js";
 
-const TOKEN_MINUTES = Number(process.env.ACCESS_TOKEN_EXPIRE_MINUTES || 15);
-
-function setTokenCookie(res, token) {
-  res.cookie("access_token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: TOKEN_MINUTES * 60 * 1000,
-  });
-}
-
 export function loginPage(req, res) {
   res.render("login", {
     error: req.query.error || null,
@@ -21,6 +10,8 @@ export function loginPage(req, res) {
 export async function loginPost(req, res) {
   const { username, password } = req.body;
 
+  console.log("loginPost reached", req.body);
+
   const user = await authenticateUser(username, password);
   if (!user) {
     return res.status(401).render("login", {
@@ -28,6 +19,8 @@ export async function loginPost(req, res) {
       email: username,
     });
   }
+
+  console.log("Logged in user role:", user.user_role);   // <-- add this
 
   req.session.userId = user.id;
   req.session.email = user.email;
