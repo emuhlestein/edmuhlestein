@@ -22,8 +22,8 @@ export async function createUser({ email, password, full_name }) {
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
   const result = await pool.query(
-    `INSERT INTO users (email, hashed_password, full_name)
-     VALUES ($1, $2, $3)
+    `INSERT INTO users (email, hashed_password, full_name, user_role)
+     VALUES ($1, $2, $3, 'user')
      RETURNING id, email, full_name`,
     [email, hashedPassword, full_name]
   );
