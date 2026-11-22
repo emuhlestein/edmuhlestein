@@ -48,6 +48,12 @@ docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev 
 ### Up Dev Local for node_app (could be any service)
 docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build node_app
 
+### Rebuild with no cache
+docker --context default compose -f docker-compose.dev.yml --env-file .env.dev build --no-cache node_app
+
+### Up dev
+docker --context default compose -f docker-compose.dev.yml --env-file .env.dev up -d --force-recreate node_app
+
 ### Down Dev Local
 docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev down --remove-orphans
 
@@ -60,8 +66,11 @@ docker --context default compose -f docker-compose.dev.yml  --env-file .env.dev 
 ### Show which containers are running
 docker --context default compose -f docker-compose.dev.yml ps
 
-**Up dev VM**
-	docker --context remote-prod compose -f docker-compose.dev.yml  --env-file .env.dev up -d --build
+### Up dev VM with build
+docker --context remote-prod compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
+
+
+
 
 **Down Dev VM**
 	docker --context remote-prod compose -f docker-compose.dev.yml  --env-file .env.dev down --remove-orphans

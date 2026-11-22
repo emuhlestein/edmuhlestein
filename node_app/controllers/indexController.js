@@ -1,9 +1,14 @@
 export function showHome(req, res) {
-  const role = req.session?.role || null;
+  console.log("showHome reached", req.session);
 
-  res.render("index.html", {
-    title: "Home",
-    role,
-    isLoggedIn: !!req.session?.userId
-  });
+  try {
+    res.render("index.html", {
+      title: "Home",
+      role: req.session?.role || null,
+      isLoggedIn: !!req.session?.userId
+    });
+  } catch (err) {
+    console.error("render failed:", err);
+    res.status(500).send("render error");
+  }
 }
