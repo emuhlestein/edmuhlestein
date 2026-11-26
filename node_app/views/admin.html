@@ -1,0 +1,16 @@
+<!-- app/templates/about.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+  <h1 class="admin">Admin</h1>
+</main>
+
+<footer>
+    {% if current_user %}
+    Signed in as {{ current_user }}
+    {% else %}
+    &copy; Ed Muhlestein
+    {% endif %}
+</footer>
+{% endblock %}
