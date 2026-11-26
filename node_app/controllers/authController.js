@@ -72,7 +72,7 @@ export async function registerPost(req, res) {
   req.session.email = user.email;
   req.session.role = user.role;
 
-  res.redirect("/dashboard");
+  res.redirect("/");
 }
 
 export function logout(req, res) {
