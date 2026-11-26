@@ -291,6 +291,8 @@ button[type="submit"]:hover {
   border-radius: 16px;
   padding: 1.45rem 1.55rem;
   margin: 1.15rem 0;
+  max-width: 520px;   /* was probably ~400px */
+  width: 100%;
 }
 
 .card h2 {

@@ -1,10 +1,12 @@
 import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
+import { isLoggedIn } from "../utils/auth.js";
 
 export async function showSettings(req, res) {
   res.render("settings", {
     message: req.query.message || null,
-    error: req.query.error || null
+    error: req.query.error || null,
+    isLoggedIn: isLoggedIn(req)
   });
 }
 
