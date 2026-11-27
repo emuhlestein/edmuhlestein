@@ -89,7 +89,7 @@ docker --context remote-prod compose -f docker-compose.dev.yml --env-file .env.d
 	docker --context remote-prod compose -f docker-compose.prod.yml  --env-file .env.prod down --remove-orphans
 
 ### To run a sql script on postgres
-docker --context default compose -f docker-compose.dev.yml exec -T postgres psql -U postgres -d appdb -f - < 1.0.sql
+docker --context default compose -f docker-compose.dev.yml exec -T postgres psql -U postgres -d appdb -f - < node_app/sql/1.1.sql
 
 ** Network **
 Remote context for VM: ssh://ed@192.168.1.19
