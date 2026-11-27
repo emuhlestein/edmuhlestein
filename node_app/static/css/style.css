@@ -589,3 +589,77 @@ footer {
 .toggle-password.showing .eye-off {
   display: block;
 }
+
+/* Progress Page */
+.controls {
+  margin-bottom: 1rem;
+}
+.controls button {
+  margin-right: 0.5rem;
+  padding: 0.4rem 0.8rem;
+}
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  max-width: 700px;
+}
+.day-name,
+.day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+.day-name {
+  font-weight: 600;
+}
+.day {
+  background: #e0e0e0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  user-select: none;
+  color: #222;
+}
+.day:hover {
+  outline: 2px solid #999;
+}
+.day.other {
+  color: #222;
+  background: #b3b3b3;
+  cursor: default;
+}
+.day.other:hover {
+  outline: none;
+}
+.year-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.year-month {
+  flex: 1;
+  border: 2px solid #ccc;
+  padding: 8px;
+  background: #fff;   /* or any color you prefer */
+  box-sizing: border-box;
+}
+.year-month h3 {
+  margin: 0 0 8px;
+  text-align: center;
+  color: #111;
+}
+.year-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  font-size: 12px;
+}
+.year-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
